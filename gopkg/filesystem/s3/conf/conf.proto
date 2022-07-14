@@ -1,0 +1,18 @@
+syntax = "proto3";
+package kratos.api;
+
+option go_package = "./;conf";
+
+message conf {
+  AWS aws = 2;
+  string name = 3;
+  string version = 4;
+}
+
+message AWS {
+  string region = 1;
+  string bucket = 2;
+  string workdir = 3;
+  string accessID = 4;
+  string accessSecret = 5;
+}
