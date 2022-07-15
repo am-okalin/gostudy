@@ -1,7 +1,7 @@
 package main
 
 import (
-	"gbasic/hello/internal/hello"
+	"basic/hello/internal/hello"
 )
 
 //main 命令源码文件：必定包含main方法
