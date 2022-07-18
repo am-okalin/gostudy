@@ -9,26 +9,20 @@ func Test1(t *testing.T) {
 	SayHello("gary")
 }
 
-//TestSayHello 测试方法
-func TestSayHello(t *testing.T) {
+func Test_sayHello(t *testing.T) {
 	type args struct {
 		name string
 	}
-	//以切片对象方式存在是为了测试多个用例
 	tests := []struct {
 		name string
 		args args
 	}{
-		{
-			name: "say bob",
-			args: args{
-				name: "bob",
-			},
-		},
+		{"test_say_downing", args{name: "downing"}},
+		{"test_say_gary", args{name: "gary"}},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			SayHello(tt.args.name)
+			sayHello(tt.args.name)
 		})
 	}
 }

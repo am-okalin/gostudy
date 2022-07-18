@@ -20,6 +20,19 @@ func TestCopy(t *testing.T) {
 	t.Log(n, string(dst))
 }
 
+func TestCopyBuffer(t *testing.T) {
+	r1 := strings.NewReader("first reader\n")
+	//r2 := strings.NewReader("second reader\n")
+	buf := make([]byte, 8)
+
+	nr, err := r1.Read(buf)
+	if err != nil {
+		return
+	}
+
+	t.Log(nr)
+}
+
 //对 io.ReadAll(r) 方法的测试
 func TestReader(t *testing.T) {
 	b := make([]byte, 0, 512)

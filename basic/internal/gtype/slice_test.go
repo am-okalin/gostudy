@@ -16,17 +16,38 @@ func TestArr(t *testing.T) {
 	}
 
 	t.Log(len(arr1), cap(arr1))
+
+	arr2 := [10]int{1, 2, 3, 4, 5, 6, 7}
+	t.Log(arr2)
+}
+
+func TestSlice(t *testing.T) {
+	var slice1 []int
+	for i := 0; i < 10; i++ {
+		//当append后的数量超过cap后，会对底层数组进行扩容
+		//扩容规则为之前容量的2倍，当容量大于1000时，则扩容为1/4
+		slice1 = append(slice1, 100-i)
+	}
+
+	for i, v := range slice1 {
+		t.Log(i, v)
+	}
+
+	t.Log(len(slice1), cap(slice1))
+
+	slice2 := []int{1, 2, 3, 4, 5, 6, 7}
+	t.Log(slice2)
 }
 
 func TestEmptyNil(t *testing.T) {
 	var a []int
 	b := new([]int)
 	c := []int{}
-	//make(type, len, cap)
-	d := make([]int, 0)
+	//make(type, len, cap) make进行初始化的操作
+	d := make([]int, 0, 0)
 
 	// a,b没有分配空间 所以为nil
-	// c,d分配了空间，实际上为空的结构体
+	// c,d分配了空间，实际上为空的结构
 	t.Log(a, *b, c, d)
 	t.Log(len(a), len(*b), len(c), len(d))
 
@@ -79,18 +100,18 @@ func TestCopy(t *testing.T) {
 	a := []int{0, 1}
 	a = append(a, 2)
 
-	//b := append(a, 4)
-	//c := append(a, 5)
-
 	// 扩容也会深拷贝
+	b := append(a, 4)
+	//t.Log(b, a[:4])
+	c := append(a, 5)
 
 	// 拷贝前要设置好length
-	b := make([]int, len(a))
-	c := make([]int, len(a), len(a)+1)
-	copy(b, a)
-	copy(c, a)
-	b = append(b, 4)
-	c = append(c, 5)
+	//b := make([]int, len(a))
+	//c := make([]int, len(a), len(a)+1)
+	//copy(b, a)
+	//copy(c, a)
+	//b = append(b, 4)
+	//c = append(c, 5)
 
 	t.Log(a, b, c)
 }

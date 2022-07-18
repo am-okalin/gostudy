@@ -3,7 +3,8 @@ package hello
 import "fmt"
 
 //A 公有变量
-var A = "a string"
+var A = "string_A"
+var a = "string_a"
 
 //SayHello 输出hello world %s
 //小写表示包级私有，外部不可调用

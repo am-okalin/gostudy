@@ -8,4 +8,5 @@ import (
 func main() {
 	name := "downing"
 	hello.SayHello(name)
+	//fmt.Println(hello.A)
 }

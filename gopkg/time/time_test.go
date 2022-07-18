@@ -30,10 +30,10 @@ func TestLocation(t *testing.T) {
 	//转换为本地时区
 	t2 := time.Now().Local()
 	t.Log(t2)
-
 	t3 := time.Now().In(loc)
 	t.Log(t3)
 
+	//通过指定时间信息及loc得到Time
 	t4 := time.Date(2001, 2, 3, 4, 5, 6, 0, loc)
 	t.Log(t4)
 

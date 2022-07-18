@@ -1,6 +1,8 @@
 package gfunc
 
-import "testing"
+import (
+	"testing"
+)
 
 func Test1(t *testing.T) {
 	f1()
