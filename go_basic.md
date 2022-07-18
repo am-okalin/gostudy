@@ -1,6 +1,6 @@
 [TOC]
-## 基础
-### 入门
+## 入门
+### 安装
 - 使用goland安装: `File`-`Settings`-`Go`-`GOROOT`-`Download...`
 - linux安装: 访问[go_download](https://go.dev/dl/)进行下载安装
 ```shell
