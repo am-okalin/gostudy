@@ -15,6 +15,8 @@ func TestArr(t *testing.T) {
 		t.Log(i, v)
 	}
 
+	t.Log(arr1)
+
 	t.Log(len(arr1), cap(arr1))
 
 	arr2 := [10]int{1, 2, 3, 4, 5, 6, 7}
@@ -44,7 +46,7 @@ func TestEmptyNil(t *testing.T) {
 	b := new([]int)
 	c := []int{}
 	//make(type, len, cap) make进行初始化的操作
-	d := make([]int, 0, 0)
+	d := make([]int, 2, 10)
 
 	// a,b没有分配空间 所以为nil
 	// c,d分配了空间，实际上为空的结构
@@ -80,6 +82,7 @@ func TestAppend(t *testing.T) {
 	//切片 指向数组的指针，可扩容;
 	var b []int
 	a := []int{1, 2, 3}
+	b = append(b, a[0], a[1], a[2])
 	b = append(b, a...)
 	t.Log(b)
 }
@@ -88,11 +91,12 @@ func TestSliceIntercept(t *testing.T) {
 	a := make([]int, 0, 10)
 	a = append(a, 0)
 	a = append(a, 1)
+	t.Log(a) // [0, 1]
+	//左闭右开区间，左边包括，右边不包括
+	//a[start:end]
+	a = a[:1] // [0]
 	t.Log(a)
-	//左开右闭区间，左边包括，右边不包括
-	a = a[:1]
-	t.Log(a)
-	a = a[:0]
+	a = a[:0] // []
 	t.Log(a)
 }
 
@@ -106,6 +110,7 @@ func TestCopy(t *testing.T) {
 	c := append(a, 5)
 
 	// 拷贝前要设置好length
+	//b := make([]int, 2)
 	//b := make([]int, len(a))
 	//c := make([]int, len(a), len(a)+1)
 	//copy(b, a)

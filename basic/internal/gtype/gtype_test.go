@@ -7,7 +7,7 @@ import (
 )
 
 func TestDeclaration(t *testing.T) {
-	var str1 string
+	var str1 string     //str1的空值
 	str2 := ""          //隐式的指定了类型为string
 	str3 := new(string) //返回指针
 	t.Log(str1, str2, str3, *str3)
@@ -60,7 +60,7 @@ func TestStr(t *testing.T) {
 
 func TestInt(t *testing.T) {
 	var ui32 uint32
-	t.Log(ui32 - 1)
+	t.Log(ui32, ui32-1)
 
 	i64 := time.Now().UnixMilli()
 	t.Log(i64, uint32(i64))
