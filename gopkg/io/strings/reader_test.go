@@ -1,12 +1,20 @@
 package strings
 
 import (
+	"bytes"
 	"io"
 	"strings"
 	"testing"
 )
 
 func TestReader(t *testing.T) {
+	r := strings.NewReader("0123456789")
+	b := make([]byte, 5, 10)
+	n, err := r.Read(b)
+	t.Log(n, err, string(b))
+}
+
+func TestSeeker(t *testing.T) {
 	r := strings.NewReader("0123456789")
 	tests := []struct {
 		off     int64
@@ -53,6 +61,28 @@ func TestReader(t *testing.T) {
 		got := string(buf[:n])
 		if got != tt.want {
 			t.Errorf("%d. got %q; want %q", i, got, tt.want)
+		}
+	}
+}
+
+func TestWriterTo(t *testing.T) {
+	const str = "0123456789"
+	for i := 0; i <= len(str); i++ {
+		s := str[i:]
+		r := strings.NewReader(s)
+		var b bytes.Buffer
+		n, err := r.WriteTo(&b)
+		if expect := int64(len(s)); n != expect {
+			t.Errorf("got %v; want %v", n, expect)
+		}
+		if err != nil {
+			t.Errorf("for length %d: got error = %v; want nil", len(s), err)
+		}
+		if b.String() != s {
+			t.Errorf("got string %q; want %q", b.String(), s)
+		}
+		if r.Len() != 0 {
+			t.Errorf("reader contains %v bytes; want 0", r.Len())
 		}
 	}
 }
