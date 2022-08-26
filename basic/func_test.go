@@ -1,6 +1,9 @@
-package gfunc
+package basic
 
-import "fmt"
+import (
+	"fmt"
+	"testing"
+)
 
 func init() {
 	fmt.Println("进行初始化操作...")
@@ -25,4 +28,18 @@ func getEatMeatFun() eat {
 		fmt.Printf("eat %s\n", meat)
 		return 2
 	}
+}
+
+func TestF1(t *testing.T) {
+	f1()
+}
+
+func Test2(t *testing.T) {
+	f1 := getEatFruitFun()
+	w1 := f1("apple")
+	t.Log(w1)
+
+	f2 := getEatMeatFun()
+	w2 := f2("Beef")
+	t.Log(w2)
 }

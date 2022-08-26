@@ -1,4 +1,4 @@
-package escape
+package basic
 
 import (
 	"fmt"
@@ -10,13 +10,13 @@ type data struct {
 }
 
 //go:noinline
-func f1() data {
+func e1() data {
 	d := data{"downing"}
 	return d
 }
 
 //go:noinline
-func f2() *data {
+func e2() *data {
 	d := data{"downing"}
 	fmt.Printf("%p\n", &d)
 	return &d
@@ -24,9 +24,9 @@ func f2() *data {
 
 //todo::执行命令做逃逸分析
 func TestEscape(t *testing.T) {
-	d1 := f1()
+	d1 := e1()
 	fmt.Printf("%p\n", &d1)
-	d2 := f2()
+	d2 := e2()
 	fmt.Printf("%p\n", d2)
 	t.Log(d1.name + d2.name)
 }

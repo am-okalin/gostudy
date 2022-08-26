@@ -22,7 +22,7 @@ func TestGetGoroot(t *testing.T) {
 		}
 	}()
 	expGoroot := runtime.GOROOT()
-	actGoroot := GetGoroot()
+	actGoroot := GetGoRoot()
 	if actGoroot != expGoroot {
 		t.Errorf("Error: The goroot should be '%s'' but '%s'.\n", expGoroot, actGoroot)
 	}
@@ -87,7 +87,7 @@ func TestGetSrcDirs(t *testing.T) {
 	fileSep := string(filepath.Separator)
 	for _, v := range actSrcDirs {
 		if !strings.HasSuffix(v, (fileSep+"src")) &&
-			!(strings.HasPrefix(v, GetGoroot()) &&
+			!(strings.HasPrefix(v, GetGoRoot()) &&
 				strings.HasSuffix(v, fileSep+"src"+fileSep+"pkg")) {
 			t.Errorf("Error: The src dir '%s' is incorrect.\n", v)
 		}

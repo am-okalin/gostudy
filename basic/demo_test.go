@@ -1,4 +1,4 @@
-package gtest
+package basic
 
 import (
 	"math"

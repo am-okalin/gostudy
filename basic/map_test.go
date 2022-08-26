@@ -1,4 +1,4 @@
-package gtype
+package basic
 
 import "testing"
 

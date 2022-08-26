@@ -1,4 +1,6 @@
-package gstruct
+package basic
+
+import "testing"
 
 type Struct1 struct {
 	param1 string
@@ -23,4 +25,13 @@ func (a *Struct1) SetParam1(param1 string) {
 
 func (a Struct1) SetParam1N(param1 string) {
 	a.param1 = param1
+}
+
+func TestStruct1(t *testing.T) {
+	a := NewStruct1(10)
+	t.Log(a)
+	a.SetParam1("字符串q")
+	t.Log(a)
+	a.SetParam1N("字符串w")
+	t.Log(a)
 }

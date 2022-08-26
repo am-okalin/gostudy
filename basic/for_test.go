@@ -1,4 +1,4 @@
-package forr
+package basic
 
 import (
 	"fmt"
@@ -27,7 +27,7 @@ func getLen() int {
 	return 5
 }
 
-func TestFor(t *testing.T) {
+func TestFori(t *testing.T) {
 	// forr range仅执行一次getList
 	for i, item := range getList(5) {
 		t.Log(i, item.Value1, item.Value2)
@@ -40,7 +40,7 @@ func TestFor(t *testing.T) {
 	}
 }
 
-func Test1(t *testing.T) {
+func TestForr(t *testing.T) {
 	for i, item := range getList(5) {
 		t.Log(i, item.Value1, item.Value2)
 	}
