@@ -34,11 +34,16 @@
 - 接口的定义，实现，测试->目前layout的应用
 - 接口组合与面向接口编程(go极其鼓励):fmt.String,io.Reader,io.Writer,io.Closer,sort包,json包,hash包	
 
+## 04 并发01
+- error,panic,defer,recover职能&特性
+- `goroutines`是GO中的`并发执行单元`，可把它看作是一个`用户级的线程`。每个`goroutines`都有一唯一标识。
+- 当一个程序启动时，其主函数在一个单独的`goroutine`中运行，我们叫它`main goroutine`，`main goroutine`结束时，会打断其所有的`子goroutine`
+- goruntine_test.go test1->test2->testPN
+- stack_test 例子中展示了如何获取唯一标识。实际上是较为复杂的字符串截取->go官方包不希望开发者通过`goid`进行协程控制
+
+
 ## 0905作业(3选2)
 - 通过json字符串，获取结构体切片和map
 - file包应用：新建文件，在文件中追加数据，从文件中读取数据
 - http实现post接口获取外部数据并输出 
 
-## 04 并发01
-- error,panic,defer
-- stack_test

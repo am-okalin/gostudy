@@ -28,4 +28,4 @@
 	+ 如要实现web应用可在`Web Frameworks`中找，要实现命令行工具可在`Command Line`中找，多线程可在`Goroutines`中找
 - 可通过[pkg.go.dev](https://pkg.go.dev/)查看代码包的说明文档。官方包的使用可直接查看[pkg.go.dev/std](https://pkg.go.dev/std)。
 	+ 但我认为通过`代码包`的`测试文件`/`样例文件`了解使用方式最方便
-- 在go中学习接口 > 学习实现。应当面向接口测试。
+- 在go中学习接口 > 学习实现。应当面向接口编程&测试。
