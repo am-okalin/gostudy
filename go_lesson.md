@@ -39,6 +39,6 @@
 - file包应用：新建文件，在文件中追加数据，从文件中读取数据
 - http实现post接口获取外部数据并输出 
 
-## 04 并发
-- 面向接口编程的包讲解: io包相关，hash包相关，sort包相关
-- GO中的并发讲解 -> sync包详解
+## 04 并发01
+- error,panic,defer
+- stack_test

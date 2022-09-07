@@ -1,5 +1,8 @@
 package basic
 
+//以_test结尾的文件就是测试源码文件
+//在编译的时候会自动跳过测试源码文件
+
 import (
 	"math"
 	"testing"
