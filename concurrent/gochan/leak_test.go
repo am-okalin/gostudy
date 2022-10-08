@@ -12,7 +12,7 @@ func process(timeout time.Duration) bool {
 
 	go func() {
 		// 模拟处理耗时的业务
-		time.Sleep((timeout + time.Second))
+		time.Sleep(timeout + time.Second)
 		ch <- true // block(阻塞) 导致goroutine泄露
 		fmt.Println("exit goroutine")
 	}()

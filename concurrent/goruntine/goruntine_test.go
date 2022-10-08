@@ -39,16 +39,16 @@ func Test1(t *testing.T) {
 }
 
 func Test2(t *testing.T) {
-	//runtime.GOMAXPROCS(1)
+	runtime.GOMAXPROCS(1)
 
-	num := 10
+	num := 9
 	for i := 0; i < num; i++ {
 		go func() {
 			fmt.Println("go1: ", i) //block
 		}()
 	}
 
-	//for i := 0; i < 10; i++ {
+	//for i := 0; i < num; i++ {
 	//	go func(i int) {
 	//		fmt.Println("go2: ", i)
 	//	}(i)

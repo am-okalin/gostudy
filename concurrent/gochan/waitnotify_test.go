@@ -49,6 +49,6 @@ func waitNotifyBySignal() {
 }
 
 func doCleanup(closed chan struct{}) {
-	time.Sleep((time.Minute))
+	time.Sleep(time.Minute)
 	close(closed)
 }

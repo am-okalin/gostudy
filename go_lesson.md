@@ -7,19 +7,18 @@
 - 错误处理的几种方式
 - 如何请求外部接口
 
-## 01 作用域、slice、func、type
+## 作用域、slice、func、type
 - 上节内容: 包管理、简单测试、函数、引用类型、切片
 - 什么情况下变量是可被其他包引用的
 - 数组与切片的区别是什么? 可以类比成什么?(滑块[https://www.html5tricks.com/demo/vuejs-slider-pips/index.html])
 - 变量的声明方式有哪些，有什么区别
 
-## 02 map、struct
-### map
+## map
 - 切片->索引数组， 关联数组->键值对->字典/映射,在go中用map表示(如目录)
 - GO是静态语言，每个类型必须声明，如何声明map，map是否要像slice一样初始化，不初始化的后果是什么
 - map是引用类型，所以不初始化的赋值会报错，所以必须深拷贝
 
-### struct
+## struct
 - 起源于C，C中的`struct`用于表示`复合类型`，在C中常用来组成`链表`，`队列`，`树`，`图`等数据结构。或根据特定的需求由开发者自定义的数据结构。
 - 其实go中的各个复杂类型都是由`strcut`构成的(go在1.5时就实现了自举)
 - 结构体的应用: 启一个`http`服务，关于`struct`和`json包`的简单应用
@@ -29,17 +28,22 @@
 - 字符操作相关类型: `strings` `[]rune` `[]byte`的应用与区别
 	+ https://segmentfault.com/q/1010000009652523
 
-## 03 面向接口编程
-### interface
+## interface
 - 接口的定义，实现，测试->目前layout的应用
 - 接口组合与面向接口编程(go极其鼓励):fmt.String,io.Reader,io.Writer,io.Closer,sort包,json包,hash包	
 
-## 04 并发01
+## 并发
+- go关键字 channel类型 sync包
+
+### goruntine
 - 复习面向接口编程，回顾case02的作业
 - error,panic,defer,recover职能&特性
 - goruntine介绍，使用方式，关闭进程与协程的类比，并行的数量控制
 - goruntine_test.go test1->test2->testPN
 - stack_test 例子中展示了如何获取唯一标识。实际上是较为复杂的字符串截取->go官方包不希望开发者通过`goid`进行协程控制
+
+## 05 并发02
+- 队列，阻塞，
 - channel进行协程间通信
 - wg并发的简单使用
 

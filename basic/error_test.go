@@ -23,12 +23,16 @@ func TestPanic(t *testing.T) {
 		}
 	}()
 
+	defer func() {
+		// 这里的err其实就是panic传入的内容
+		if err := recover(); err != nil {
+			fmt.Println(err)
+			panic("downing test panic")
+		}
+	}()
+
 	//panic("downing test panic")
 	doSomethingPanic()
 
 	fmt.Println("hi")
-	if err := recover(); err != nil {
-		// 这里的err其实就是panic传入的内容
-		fmt.Println(err)
-	}
 }
