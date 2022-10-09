@@ -33,7 +33,7 @@
 - 接口组合与面向接口编程(go极其鼓励):fmt.String,io.Reader,io.Writer,io.Closer,sort包,json包,hash包	
 
 ## 并发
-- go关键字 channel类型 sync包
+- 主要包含三个内容 关键字goruntine 类型channel 包sync
 
 ### goruntine
 - 复习面向接口编程，回顾case02的作业
@@ -42,9 +42,16 @@
 - goruntine_test.go test1->test2->testPN
 - stack_test 例子中展示了如何获取唯一标识。实际上是较为复杂的字符串截取->go官方包不希望开发者通过`goid`进行协程控制
 
-## 05 并发02
-- 队列，阻塞，
-- channel进行协程间通信
+### channel01
+- 复习：父子goruntine的关系，panic对goruntine的影响，
+	+ 子goruntine发生panic时会导致什么问题，如何解决
+	+ 能否往子goruntine中传递引用类型，为什么
+	+ 上节课案例中我们是如何阻塞goruntine的?
+- 阻塞队列，并发队列的定义，阻塞队列在什么时候阻塞? ->(不)带缓存的channel
+- 手写代码： go1中输入字符，go2输出字符
+
+### channel02
+- channel如何实现协程间通信，定义
 - wg并发的简单使用
 
 

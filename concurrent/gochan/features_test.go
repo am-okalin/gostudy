@@ -7,17 +7,6 @@ import (
 	"time"
 )
 
-func TestCh0(t *testing.T) {
-	//ch := new(chan struct{})
-	ch := make(chan struct{})
-	go func() {
-		<-ch
-		fmt.Println("子goruntine结束")
-	}()
-	ch <- struct{}{}
-	fmt.Println("父goruntine结束")
-}
-
 // chan的初始化
 func TestChInit(t *testing.T) {
 	num := 3
@@ -124,9 +113,45 @@ func TestChClose(t *testing.T) {
 	time.Sleep(3 * time.Second)
 }
 
+func TestCh1(t *testing.T) {
+	//通道作为`传递某种简单信号`的`介质`时，用struct{}最合适
+	//ch := new(chan struct{})
+	ch := make(chan struct{})
+	go func() {
+		<-ch
+		fmt.Println("子goruntine结束")
+	}()
+	//struct{}类型`值的表示法`只有一个即 struct{}{}, 占用内存空间=0字节
+	//这个值在整个`Go程序`中永远都只会存在一份。虽然我们可以无数次地使用这个`值字面量`，但是用到的却都是同一个值。
+	ch <- struct{}{}
+	fmt.Println("父goruntine结束")
+}
+
+func TestCh2(t *testing.T) {
+	num := 10
+	ch := make(chan string, num)
+	go func() {
+		for i := 0; i < num; i++ {
+			ch <- fmt.Sprintf("a%d", i)
+			t.Logf("in:a%d", i)
+			time.Sleep(time.Second)
+		}
+		close(ch)
+	}()
+
+	go func() {
+		for i := 0; i < num; i++ {
+			v := <-ch
+			t.Logf("out:%s", v)
+			//time.Sleep(time.Second)
+		}
+	}()
+
+	time.Sleep(time.Minute)
+}
+
 func TestCh3(t *testing.T) {
 	num := 10
-	//通道作为`传递某种简单信号`的`介质`时，用struct{}最合适
 	sign := make(chan struct{}, num)
 
 	//猜猜输出什么
@@ -134,8 +159,6 @@ func TestCh3(t *testing.T) {
 		go func() {
 			//子goruntine在运行到这一行时才拿i的值进行输出
 			fmt.Println(i)
-			//struct{}类型`值的表示法`只有一个即 struct{}{}, 占用内存空间=0字节
-			//这个值在整个`Go程序`中永远都只会存在一份。虽然我们可以无数次地使用这个`值字面量`，但是用到的却都是同一个值。
 			sign <- struct{}{}
 		}()
 	}
