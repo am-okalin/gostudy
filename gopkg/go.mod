@@ -14,6 +14,7 @@ require (
 	github.com/go-redis/redis/v8 v8.11.5
 	github.com/go-sql-driver/mysql v1.6.0
 	github.com/hasura/go-graphql-client v0.8.0
+	github.com/jpillora/ipfilter v1.2.8
 	github.com/onsi/gomega v1.20.0
 	github.com/panjf2000/ants/v2 v2.5.0
 	github.com/pkg/errors v0.9.1
@@ -47,8 +48,10 @@ require (
 	github.com/jinzhu/now v1.1.5 // indirect
 	github.com/jmespath/go-jmespath v0.4.0 // indirect
 	github.com/klauspost/compress v1.10.3 // indirect
+	github.com/phuslu/iploc v1.0.20220830 // indirect
 	github.com/rabbitmq/amqp091-go v1.4.0 // indirect
 	github.com/satori/go.uuid v1.2.0 // indirect
+	github.com/tomasen/realip v0.0.0-20180522021738-f0c99a92ddce // indirect
 	golang.org/x/net v0.0.0-20220425223048-2871e0cb64e4 // indirect
 	golang.org/x/text v0.3.7 // indirect
 	golang.org/x/time v0.0.0-20191024005414-555d28b269f0 // indirect

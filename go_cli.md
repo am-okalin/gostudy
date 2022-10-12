@@ -51,6 +51,10 @@
 - `-o` 指定输出文件名称
 - `-i` 安装`依赖包`。即产生`依赖包`的归档文件至`$GOPATH/pkg/...`下
 
+``` shell
+env GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go build mian.go
+```
+
 ### go install
 - `install`只比`build`多做了一件事: 安装编译后的`结果文件`到`指定目录`
 - `命令源码文件`的编译生成的`可执行文件`保存在`$GOROOT/bin`下

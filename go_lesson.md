@@ -1,8 +1,5 @@
 ## todo
-- map、结构体、方法、json转换
-- goruntine 和 chan 的基本使用(优雅退出)
 - context详解
-- 从接口中往文件中读写内容
 - 黑名单用户处理
 - 错误处理的几种方式
 - 如何请求外部接口
@@ -47,8 +44,10 @@
 	+ 子goruntine发生panic时会导致什么问题，如何解决
 	+ 能否往子goruntine中传递引用类型，为什么
 	+ 上节课案例中我们是如何阻塞goruntine的?
-- 阻塞队列，并发队列的定义，阻塞队列在什么时候阻塞? ->(不)带缓存的channel
-- 手写代码： go1中输入字符，go2输出字符
+- 阻塞队列，并发队列的定义，阻塞队列在什么时候阻塞? ->(不)带缓存的channel	
+- ch2->ch1->chInit->chFor->chClose->ch3->ch4->notifyBySignal
+- (两人一组)手写代码： go1中输入字符，go2输出字符
+
 
 ### channel02
 - channel如何实现协程间通信，定义
