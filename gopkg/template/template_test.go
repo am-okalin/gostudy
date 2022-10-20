@@ -6,11 +6,6 @@ import (
 	"text/template"
 )
 
-type Inventory struct {
-	ShopName string `template:"STORE_NAME"`
-	Count    uint
-}
-
 func Test1(t *testing.T) {
 	sweaters := Inventory{"wool", 17}
 	tmpl, err := template.New("test").Delims("*|", "|*").
@@ -24,4 +19,13 @@ func Test1(t *testing.T) {
 		panic(err)
 	}
 	t.Log(buf.String())
+}
+
+func TestRender(t *testing.T) {
+	str := "*|SHOP_DOMAIN|*/discount/*|INVITEE_CODE|*"
+	str = Render(str, &Inventory{
+		ShopName: "wtn_shop_domain",
+		Count:    10,
+	}, "*|", "|*")
+	t.Log(str)
 }
