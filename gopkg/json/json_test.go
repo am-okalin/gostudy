@@ -25,7 +25,7 @@ func TestJson(t *testing.T) {
 
 func TestJsonNil(t *testing.T) {
 	var ms1 []*Media
-	ms2 := []*Media{}
+	var ms2 []*Media
 
 	jsonBytes, err := json.Marshal(ms1)
 

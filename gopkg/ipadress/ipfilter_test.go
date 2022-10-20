@@ -1,4 +1,4 @@
-package other
+package ipadress
 
 import (
 	"github.com/jpillora/ipfilter"

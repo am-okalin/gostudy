@@ -1,4 +1,4 @@
-package gsort
+package container
 
 import (
 	"fmt"
