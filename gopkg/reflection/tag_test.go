@@ -1,7 +1,6 @@
 package reflection
 
 import (
-	"fmt"
 	"reflect"
 	"testing"
 )
@@ -14,5 +13,16 @@ func TestTag(t *testing.T) {
 	s := S{}
 	st := reflect.TypeOf(s)
 	field := st.Field(0)
-	fmt.Println(field.Tag.Get("color"), field.Tag.Get("species"))
+	name, flag := st.FieldByName("F")
+	t.Log(name.Tag, flag)
+	t.Log(field.Tag.Get("color"), field.Tag.Get("species"))
+}
+
+func TestValue(t *testing.T) {
+	s := S{F: "downing_test"}
+	v := reflect.ValueOf(s).FieldByName("F")
+	if v.Kind() != reflect.String {
+		t.Error("类型不为string")
+	}
+	t.Log(v.String())
 }
