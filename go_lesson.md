@@ -50,8 +50,12 @@
 
 
 ### channel02
-- channel如何实现协程间通信，定义
-- wg并发的简单使用
+- 复习：channel，循环，阻塞，close后的in&out使用情况
+	+ 什么情况下会阻塞协程
+	+ 循环读取channel中的数据可以用哪些关键字
+	+ close后的in会导致panic嘛
+	+ close后的out能不能拿到数据
+- channel在官方包中的使用：信号量的获取
 
 
 ## 作业
