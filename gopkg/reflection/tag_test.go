@@ -26,3 +26,13 @@ func TestValue(t *testing.T) {
 	}
 	t.Log(v.String())
 }
+
+func TestName(t *testing.T) {
+	rt := reflect.TypeOf(S{})
+	n := rt.Field(0).Name
+	t.Log(n)
+
+	rv := reflect.ValueOf(S{})
+	n = rv.Type().Name()
+	t.Log(n)
+}
