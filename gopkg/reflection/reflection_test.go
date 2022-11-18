@@ -6,70 +6,66 @@ import (
 	"os"
 	"reflect"
 	"testing"
-	"time"
 )
 
-// 定义一个Enum类型
-type Enum int
+// TestDemo 反射的基本使用
+func TestDemo(t *testing.T) {
+	var w io.Writer = os.Stdout
+	wt := reflect.TypeOf(w)
+	wv := reflect.ValueOf(w)
+	//wvt := reflect.ValueOf(w).Type() //等同于wt
 
-const (
-	Zero Enum = 0
-)
+	fmt.Printf("%T\n", w) // "*os.File"
+	fmt.Println(wt)       // reflect.TypeOf返回具体的类型
 
-func TestTypeOf(t *testing.T) {
-	var w io.Writer = os.Stdout    // reflect.TypeOf总是返回具体的类型
-	fmt.Println(reflect.TypeOf(w)) // "*os.File"
-	fmt.Printf("%T\n", w)
+	fmt.Printf("%v\n", wv.Interface()) // "&{0xc0000c6280}"
+	fmt.Println(wv)                    // reflect.Value返回具体的值(若是指针类型,则返回其指向的地址)
+	fmt.Println(wv.String())           // "<*os.File Value>"
 
-	to := reflect.TypeOf(3)
-	t.Log(to)
+	fmt.Println(wv.Kind() == reflect.Int) //true
 }
 
-func TestValueOf(t *testing.T) {
-	//v := reflect.ValueOf(3)
+// TestStruct 反射中对结构体的解析
+func TestStruct(t *testing.T) {
+	s := User{Name: "user1"}
+	st := reflect.TypeOf(s)
 
-	v := reflect.ValueOf(3)              // reflect.Value
-	fmt.Println(v)                       // "3"
-	fmt.Printf("%v\n", v.Interface())    // "3"
-	fmt.Println(v.Kind() == reflect.Int) //true
-	fmt.Println(v.String())              // NOTE: "<int Value>"
+	//获取对象中的属性信息
+	stf0 := st.Field(0)
+	stfAge, ok := st.FieldByName("Age")
+	if !ok {
+		t.Error("Age 属性不存在")
+	}
+	fmt.Println(st.Name(), stf0, stfAge)
+
+	//获取属性相关的Tag信息
+	color := stf0.Tag.Get("color")
+	species := stf0.Tag.Get("species")
+	fmt.Println(color, species)
 }
 
-func TestDemo2(t *testing.T) {
-	defer func() {
-		p := recover()
-		t.Log("panic:", p)
-	}()
+// TestSet 反射中对变量的重新赋值
+func TestSet(t *testing.T) {
+	var err error
+	u := User{Name: "user1"}
+	uv := reflect.ValueOf(u)           //传递u的拷贝
+	uvpr := reflect.ValueOf(&u).Elem() //传递u的地址后解引用
 
-	var x float64 = 3.4
-	// (v Value) Elem() 将指针指向的值解析到v中
-	v1 := reflect.ValueOf(&x).Elem()         //传递x的地址后解引用
-	v2 := reflect.ValueOf(x)                 //传递x的拷贝
-	t.Log("settability of v1:", v1.CanSet()) //true
-	t.Log("settability of v2:", v2.CanSet()) //false
-	v1.SetFloat(7.1)                         //ok
-	t.Log("v‘s value is", v1)
-	v2.SetFloat(7.1) //Error: will panic
+	//值变量传递了拷贝无法被寻址，所以set失败
+	err = setValue(uv, reflect.ValueOf(User{Name: "user2"}))
+	if err != nil {
+		t.Log(err)
+	}
+
+	//成功
+	err = setValue(uvpr, reflect.ValueOf(User{Name: "user2"}))
+	if err != nil {
+		t.Log(err)
+	}
+
+	//设置的值类型不同，所以set失败
+	err = setValue(uvpr, reflect.ValueOf(1))
+	if err != nil {
+		t.Log(err)
+	}
 }
-
-func TestAny(t *testing.T) {
-	var x int64 = 1
-	var d time.Duration = 1 * time.Nanosecond
-	fmt.Println(Any(x))          // "1"
-	fmt.Println(Any(d))          // "1"
-	fmt.Println(Any([]int64{x})) // "[]int64 0x8202b87b0"
-	fmt.Println(Any([]time.Duration{d}))
-}
-
-func TestSelect1(t *testing.T) {
-	Select1()
-}
-
-func TestSelect2(t *testing.T) {
-	Select2()
-}
-
-//func TestStruct(t *testing.T) {
-//	err := toMap()
-//	t.Log(err)
-//}
