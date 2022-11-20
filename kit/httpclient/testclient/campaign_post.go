@@ -2,7 +2,7 @@ package testclient
 
 import (
 	"io"
-	"other/httpclient"
+	"kit/httpclient"
 )
 
 type CampaignGetUrlParam struct {
