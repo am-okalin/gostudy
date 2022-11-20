@@ -3,7 +3,6 @@ module gopkg
 go 1.18
 
 require (
-	bitbucket.org/fstlnrd/fstln-package v0.0.0-20220816091106-df67bf4bb59f
 	github.com/aliyun/aliyun-oss-go-sdk v2.2.4+incompatible
 	github.com/aws/aws-sdk-go v1.44.79
 	github.com/aws/aws-sdk-go-v2 v1.16.11
@@ -13,7 +12,6 @@ require (
 	github.com/aws/aws-sdk-go-v2/service/s3 v1.27.5
 	github.com/go-redis/redis/v8 v8.11.5
 	github.com/go-sql-driver/mysql v1.6.0
-	github.com/hasura/go-graphql-client v0.8.0
 	github.com/jpillora/ipfilter v1.2.8
 	github.com/onsi/gomega v1.20.0
 	github.com/panjf2000/ants/v2 v2.5.0
