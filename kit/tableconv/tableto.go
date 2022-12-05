@@ -5,7 +5,7 @@ import (
 	"os"
 )
 
-//ToM 将二维数组转换为map
+// ToM 将二维数组转换为map
 func ToM(table [][]string) (map[string][]string, int) {
 	rl := len(table)
 	cl := len(table[0])
@@ -25,8 +25,8 @@ func ToM(table [][]string) (map[string][]string, int) {
 	return m, rl - 1
 }
 
-//ToObj 将二维数组转换为对象数组
-func ToObj(table [][]string, v any) error {
+// ToObj 将二维数组转换为对象数组
+func ToObj(table [][]string, objs any) error {
 	for i := 1; i < len(table); i++ {
 
 	}
