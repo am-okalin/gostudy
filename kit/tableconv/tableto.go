@@ -34,7 +34,7 @@ func ToObj(table [][]string, objs any) error {
 }
 
 func ToCsv(table [][]string, fname string) error {
-	file, err := os.OpenFile(fname, os.O_CREATE|os.O_APPEND|os.O_RDWR, 0666)
+	file, err := os.OpenFile(fname, os.O_CREATE|os.O_RDWR, 0666)
 	if err != nil {
 		return err
 	}

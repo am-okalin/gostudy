@@ -1,7 +1,6 @@
 package tableconv
 
 import (
-	"encoding/json"
 	"testing"
 )
 
@@ -27,8 +26,6 @@ func TestTo(t *testing.T) {
 	if err != nil {
 		t.Error(err)
 	}
-
-	json.Unmarshal()
 
 	t.Log("done")
 }

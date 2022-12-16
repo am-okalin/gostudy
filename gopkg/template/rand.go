@@ -2,7 +2,7 @@ package template
 
 import (
 	"fmt"
-	"github.com/prometheus/common/log"
+	"log"
 	"reflect"
 	"strings"
 )
@@ -31,7 +31,7 @@ func Render(str string, variables interface{}, left, right string) string {
 
 	if v.Kind() != reflect.Struct {
 		err := fmt.Errorf("ToMap only accepts struct or struct pointer; got %T", v)
-		log.Error(err)
+		log.Fatal(err)
 		return str
 	}
 
