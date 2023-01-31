@@ -28,3 +28,8 @@ func Test1(t *testing.T) {
 	rep2 := re.ReplaceAllString(url, "b")
 	t.Log(rep2)
 }
+
+func Test2(t *testing.T) {
+	a := strings.ReplaceAll("assets/cmp/referral/popcat.png", "/", "_")
+	t.Log(a)
+}
