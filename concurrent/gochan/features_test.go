@@ -32,6 +32,16 @@ func TestChInit(t *testing.T) {
 	t.Log(len(chs2), cap(chs2))
 }
 
+// todo::优雅退出select
+func TestSelect(t *testing.T) {
+	//select {
+	//case <-closed:
+	//case <-time.After(time.Second):
+	//	fmt.Println("goroutine cleanup time out")
+	//}
+	//fmt.Println("goroutine cleanup success")
+}
+
 // chan使用for-select for-range
 func TestChFor(t *testing.T) {
 	// 使用select
@@ -53,27 +63,32 @@ func TestChFor(t *testing.T) {
 				fmt.Println("for-select:", v)
 			}
 		}
+		//todo::本协程未退出
+		fmt.Println("for select done")
 	}()
 
 	// for-range与for-select功能相等
 	go func() {
+		time.Sleep(time.Second)
 		//可用 for range ch {} 清空元素后阻塞
 		for v := range ch {
 			fmt.Println("for-range :", v)
 		}
+		fmt.Println("for range done")
 	}()
 
 	//往两个goruntine中投递数据
 	for i := 5; i < 10; i++ {
 		ch <- i
 	}
+	close(ch)
 
 	//延迟2秒后退出主进程
 	time.Sleep(time.Second * 2)
 	fmt.Println("done")
 }
 
-//chan_close的特性
+// chan_close的特性
 func TestChClose(t *testing.T) {
 	//部分chan操作会导致panic
 	defer func() {
@@ -109,6 +124,8 @@ func TestChClose(t *testing.T) {
 			t.Log(<-ch2)
 		}
 	}()
+
+	//todo::测试forrange的清理逻辑
 
 	time.Sleep(3 * time.Second)
 }

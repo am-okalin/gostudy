@@ -56,7 +56,7 @@ func TestTime(t *testing.T) {
 
 	// 返回秒数
 	b := a.Unix()
-	b2 := a.UnixMilli()
+	b2 := a.UnixMilli() //13位毫秒
 	b3 := a.UnixMicro()
 	b4 := a.UnixNano()
 	t.Log(b, b2, b3, b4)

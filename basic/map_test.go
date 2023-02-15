@@ -1,6 +1,9 @@
 package basic
 
-import "testing"
+import (
+	"sync/atomic"
+	"testing"
+)
 
 func TestNewMap(t *testing.T) {
 	// 赋空值初始化
@@ -49,4 +52,11 @@ func TestMM(t *testing.T) {
 	f2, ok2 := mm[1][2] //0 flase
 	t.Log(f1, ok1)
 	t.Log(f2, ok2)
+}
+
+func TestAtomicAdd(t *testing.T) {
+	m := make(map[string]*uint64)
+	//报错: m["a"]的值是nil
+	atomic.AddUint64(m["a"], 1)
+	t.Log(m)
 }

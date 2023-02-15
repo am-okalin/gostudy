@@ -23,11 +23,15 @@ func TestUrl(t *testing.T) {
 	if err != nil {
 		t.Error(err)
 	}
-	uri1 := u1.RequestURI()
-	t.Log(u1, uri1)
 
 	//param解析(要去除'?')
 	q1 := u1.Query()
+	q1.Add("mq", "rabbit")
+	u1.RawQuery = q1.Encode()
+	uri1 := u1.RequestURI()
+	t.Log(u1, uri1)
+
+	//解析query字符串
 	q2, err := url.ParseQuery(query1)
 	if err != nil {
 		t.Error(err)

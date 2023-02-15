@@ -9,7 +9,7 @@ import (
 	"time"
 )
 
-//TestWaitNotifyBySignal 使用chan实现信号通知
+// TestWaitNotifyBySignal 使用chan实现信号通知
 func TestWaitNotifyBySignal(t *testing.T) {
 	waitNotifyBySignal()
 }
@@ -23,6 +23,7 @@ func waitNotifyBySignal() {
 		for {
 			select {
 			case <-closing:
+				//处理一些退出业务
 				return
 			default:
 				// ....... 业务计算
@@ -31,6 +32,7 @@ func waitNotifyBySignal() {
 		}
 	}()
 
+	// todo::标出执行test的命令
 	// 处理CTRL+C等中断信号
 	termChan := make(chan os.Signal)
 	signal.Notify(termChan, os.Interrupt, os.Kill, syscall.SIGHUP, syscall.SIGINT, syscall.SIGTERM, syscall.SIGQUIT)
@@ -49,6 +51,6 @@ func waitNotifyBySignal() {
 }
 
 func doCleanup(closed chan struct{}) {
-	time.Sleep(time.Minute)
+	//time.Sleep(time.Minute)
 	close(closed)
 }
