@@ -18,3 +18,13 @@ func TestCut(t *testing.T) {
 	before, after, found := strings.Cut(s2, "c")
 	t.Log(before, after, found)
 }
+
+func TestContains(t *testing.T) {
+	s := "Duplicate entry 'imei1_test_1' for key 'idx_ems_spare_imeis_imei'"
+
+	if strings.Contains(s, "idx_ems_spare_imeis_imei") {
+		t.Log("err1")
+	}
+
+	t.Log("done")
+}

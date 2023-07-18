@@ -20,6 +20,7 @@ require (
 	github.com/panjf2000/ants/v2 v2.5.0
 	github.com/pkg/errors v0.9.1
 	github.com/rs/xid v1.4.0
+	github.com/shopspring/decimal v1.3.1
 	github.com/streadway/amqp v1.0.0
 	golang.org/x/text v0.3.7
 	google.golang.org/protobuf v1.28.1
