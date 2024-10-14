@@ -9,6 +9,7 @@ import (
 
 func TestProcessorNum(t *testing.T) {
 	// 获取当前processor数量
+	println(runtime.GOMAXPROCS(-1))
 	println(runtime.GOMAXPROCS(0))
 
 	// 设置processor数量

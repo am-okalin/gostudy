@@ -43,8 +43,11 @@ func (employee *Employee) Role(role string) {
 
 func Test1(t *testing.T) {
 	var (
-		user      = User{Name: "Jinzhu", Age: 18, Role: "Admin", Salary: 200000}
-		users     = []User{{Name: "Jinzhu", Age: 18, Role: "Admin", Salary: 100000}, {Name: "jinzhu 2", Age: 30, Role: "Dev", Salary: 60000}}
+		user  = User{Name: "Jinzhu", Age: 18, Role: "Admin", Salary: 200000}
+		users = []User{
+			{Name: "Jinzhu", Age: 18, Role: "Admin", Salary: 100000},
+			{Name: "jinzhu 2", Age: 30, Role: "Dev", Salary: 60000},
+		}
 		employee  = Employee{Salary: 150000}
 		employees = []Employee{}
 	)
