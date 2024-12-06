@@ -10,7 +10,7 @@ import (
 )
 
 const (
-	tempWorkDir      = "../file"
+	tempWorkDir      = "./file"
 	cpuProfilePath   = tempWorkDir + "/cpu.out"
 	memProfilePath   = tempWorkDir + "/mem.out"
 	blockProfilePath = tempWorkDir + "/block.out"
