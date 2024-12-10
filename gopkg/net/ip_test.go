@@ -14,7 +14,7 @@ func TestIpFilter(t *testing.T) {
 	t.Log(flag)
 }
 
-func Test1(t *testing.T) {
+func TestIP1(t *testing.T) {
 	start := "93.171.14.0"
 	end := "93.171.72.255"
 	si := net.ParseIP(start)
@@ -22,7 +22,7 @@ func Test1(t *testing.T) {
 	t.Log(ei, si)
 }
 
-func Test2(t *testing.T) {
+func TestIP2(t *testing.T) {
 	ip, net, err := net.ParseCIDR("93.171.14.0/23")
 	t.Log(ip, net, err)
 }
