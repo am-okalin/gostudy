@@ -7,10 +7,10 @@ import (
 	"github.com/aws/aws-sdk-go-v2/config"
 	"github.com/aws/aws-sdk-go-v2/credentials"
 	"github.com/aws/aws-sdk-go-v2/service/s3"
-	"gopkg/filesystem/s3/conf"
 	"io"
 	"log"
 	"os"
+	"pkg_third/filesystem/s3/conf"
 )
 
 func getConf() *conf.AWS {
@@ -53,11 +53,12 @@ func upload(client s3.Client, filepath, bucket, key string) error {
 	}
 
 	//上传文件
+	cl := stat.Size()
 	_, err = client.PutObject(context.TODO(), &s3.PutObjectInput{
 		Bucket:        aws.String(bucket),
 		Key:           aws.String(key),
 		Body:          file,
-		ContentLength: stat.Size(),
+		ContentLength: &cl,
 	})
 	return err
 }
@@ -121,7 +122,7 @@ func delFilesByBucket(client s3.Client, bucket string) {
 		}
 	}
 
-	for listObjectsV2Response.IsTruncated {
+	for *listObjectsV2Response.IsTruncated {
 		listObjectsV2Response, err = client.ListObjectsV2(context.TODO(),
 			&s3.ListObjectsV2Input{
 				Bucket:            aws.String(bucket),

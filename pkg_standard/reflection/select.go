@@ -7,7 +7,7 @@ import (
 )
 
 func initChs(num int) []chan interface{} {
-	var chs = make([]chan interface{},0)
+	var chs = make([]chan interface{}, 0)
 	for i := 0; i < num; i++ {
 		chs = append(chs, make(chan interface{}, 10))
 	}

@@ -18,6 +18,6 @@ func TestList(t *testing.T) {
 	backVal := l.Remove(l.Back())
 	length := l.Len()
 	l.Init() // 初始化为空链表
-	t.Log(v1.Value,v2.Value,v3.Value,v4.Value)
-	t.Log(front.Value,backVal,length)
+	t.Log(v1.Value, v2.Value, v3.Value, v4.Value)
+	t.Log(front.Value, backVal, length)
 }

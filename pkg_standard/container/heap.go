@@ -17,8 +17,8 @@ func (h *IntHeap) Len() int {
 }
 
 func (h *IntHeap) Pop() interface{} {
-	x := (*h)[h.Len() - 1]
-	*h = (*h)[: h.Len() - 1]
+	x := (*h)[h.Len()-1]
+	*h = (*h)[:h.Len()-1]
 	return x
 }
 

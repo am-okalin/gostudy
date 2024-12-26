@@ -1,18 +1,9 @@
 package net
 
 import (
-	"github.com/jpillora/ipfilter"
 	"net"
 	"testing"
 )
-
-func TestIpFilter(t *testing.T) {
-	filter := ipfilter.New(ipfilter.Options{
-		BlockedIPs: []string{"93.171.14.0/23"},
-	})
-	flag := filter.Blocked("93.171.14.1")
-	t.Log(flag)
-}
 
 func TestIP1(t *testing.T) {
 	start := "93.171.14.0"

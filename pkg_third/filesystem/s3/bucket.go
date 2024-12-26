@@ -143,7 +143,7 @@ func BucketDelOps(client s3.Client, name string) {
 			}
 		}
 
-		if listObjectsV2Response.IsTruncated {
+		if *listObjectsV2Response.IsTruncated {
 			listObjectsV2Response, err = client.ListObjectsV2(context.TODO(),
 				&s3.ListObjectsV2Input{
 					Bucket:            aws.String(name),
