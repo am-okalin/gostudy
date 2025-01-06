@@ -45,7 +45,7 @@ func NewPageProducts(shopifyClient ShopifyClient) *PageProducts {
 	return &PageProducts{ShopifyClient: shopifyClient, reqObj: reqObj}
 }
 
-func (a PageProducts) request() error {
+func (a *PageProducts) request() error {
 	reqBytes, err := json.Marshal(a.reqObj)
 	if err != nil {
 		return err

@@ -7,9 +7,10 @@ import (
 	"testing"
 )
 
-//哨兵
+// 哨兵
 var ErrNotFound = errors.New("not found")
 
+// 自定义错误类型
 type QueryError struct {
 	Query string
 	Msg   string
@@ -17,56 +18,53 @@ type QueryError struct {
 }
 
 func (e QueryError) Error() string {
-	return fmt.Sprintf("query_error:%v", e.Msg)
+	return fmt.Sprintf("{msg:%v; err:%v}", e.Msg, e.Err)
 }
 
 func (e QueryError) Unwrap() error {
 	return e.Err
 }
 
-func Test1(t *testing.T) {
-	//false 两变量的地址不一样
-	e1 := errors.New("not found")
-	fmt.Println(ErrNotFound == e1)
-	//error可接受内建类型的值，或实现了error接口的自定义类型
-	assertQE(QueryError{Err: ErrNotFound})
-	//error也可接受自定义类型的指针，注意断言时必须正确书写
-	assertQEP(&QueryError{Err: e1})
-}
+// TestIs 类型判断
+func TestIs(t *testing.T) {
+	// 使用 直等 判断哨兵错误
+	err := ErrNotFound
+	if err == ErrNotFound {
+		t.Logf("the err is   ErrNotFound")
+	}
 
-func assertQE(err error) {
-	e, ok := err.(QueryError)
-	fmt.Println(e, ok)
-}
-
-func assertQEP(err error) {
-	e, ok := err.(*QueryError)
-	fmt.Println(e, ok)
-}
-
-func Test2(t *testing.T) {
-	//传参不能是指针类型，否则在反射包中就无法成功
-	assertError(QueryError{Err: ErrNotFound})
-}
-
-func assertError(err error) {
-	//错误判断,只要错误链中存在ErrNotFound就返回true
+	// 使用 errors.Is 判断错误链中是否存在ErrNotFound
+	err = fmt.Errorf("wrap error: %w", ErrNotFound)
 	if errors.Is(err, ErrNotFound) {
-		fmt.Println("the err wrap ErrNotFound")
-	}
-
-	//错误断言,As的第二个参数target必须是指向错误的指针
-	target := &QueryError{Err: io.EOF}
-	if errors.As(err, target) {
-		//此时target已经指向了err的内容
-		fmt.Println(target.Err)
+		t.Logf("the err wrap ErrNotFound")
 	}
 }
 
-func Test3(t *testing.T) {
-	//fmt.Errorf用fmt.wrapError包装了err
-	err := fmt.Errorf("wrap error: %w", ErrNotFound)
-	if errors.Is(err, ErrNotFound) {
-		fmt.Printf("%T, %v", err, ErrNotFound)
+// TestAs 类型断言
+func TestAs(t *testing.T) {
+	// error可接受内建类型的值，或实现了error接口的自定义类型
+	if ae1, ok := GetQueryError().(QueryError); ok {
+		t.Logf("%+v", ae1)
 	}
+
+	// error也可接受自定义类型的指针，注意断言时必须正确书写
+	if ae2, ok := GetQueryErrorPtr().(*QueryError); ok {
+		t.Logf("%+v", ae2)
+	}
+
+	// target在错误链中存在? 若存在则将`其`值赋值给target(即便有值)
+	err := fmt.Errorf("wrap error: %w", GetQueryError())
+	target := QueryError{Err: io.EOF, Msg: "输入结束"}
+	if errors.As(err, &target) {
+		t.Logf("%T, %+v", err, err)
+		t.Logf("%T, %+v", target, target)
+	}
+}
+
+func GetQueryError() error {
+	return QueryError{Err: ErrNotFound, Msg: "无指针错误"}
+}
+
+func GetQueryErrorPtr() error {
+	return &QueryError{Err: ErrNotFound, Msg: "有指针错误"}
 }

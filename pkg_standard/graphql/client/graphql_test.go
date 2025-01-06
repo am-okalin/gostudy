@@ -7,8 +7,8 @@ import (
 
 func Test1(t *testing.T) {
 	sc := ShopifyClient{
-		StoreName: "redmagicdev",
-		Token:     "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",
+		StoreName: "yuan-dev",
+		Token:     "shpat_*",
 		client:    &http.Client{},
 	}
 	products := NewPageProducts(sc)

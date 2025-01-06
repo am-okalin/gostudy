@@ -13,6 +13,7 @@ require (
 	github.com/aws/aws-sdk-go-v2/feature/s3/manager v1.17.44
 	github.com/aws/aws-sdk-go-v2/service/s3 v1.71.1
 	github.com/bold-commerce/go-shopify/v4 v4.7.0
+	github.com/go-pkgz/expirable-cache/v3 v3.0.0
 	github.com/go-redis/redis/v8 v8.11.5
 	github.com/go-sql-driver/mysql v1.8.1
 	github.com/jinzhu/copier v0.4.0
@@ -21,10 +22,10 @@ require (
 	github.com/onsi/gomega v1.36.2
 	github.com/panjf2000/ants/v2 v2.10.0
 	github.com/r0busta/go-shopify-graphql/v8 v8.0.7
+	github.com/rabbitmq/amqp091-go v1.10.0
 	github.com/rs/xid v1.6.0
 	github.com/sendgrid/sendgrid-go v3.16.0+incompatible
 	github.com/shopspring/decimal v1.4.0
-	github.com/streadway/amqp v1.1.0
 	github.com/stretchr/testify v1.10.0
 	golang.org/x/time v0.8.0
 	google.golang.org/genproto v0.0.0-20241223144023-3abc09e42ca8

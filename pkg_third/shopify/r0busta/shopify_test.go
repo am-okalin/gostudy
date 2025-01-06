@@ -10,7 +10,7 @@ import (
 const (
 	maxRetries = 3
 	shopName   = "yuan-dev"
-	token      = "shpat_d266"
+	token      = "shpat_*"
 )
 
 var ctx = context.Background()
