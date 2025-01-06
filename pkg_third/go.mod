@@ -13,6 +13,7 @@ require (
 	github.com/aws/aws-sdk-go-v2/feature/s3/manager v1.17.44
 	github.com/aws/aws-sdk-go-v2/service/s3 v1.71.1
 	github.com/bold-commerce/go-shopify/v4 v4.7.0
+	github.com/go-pkgz/expirable-cache/v3 v3.0.0
 	github.com/go-redis/redis/v8 v8.11.5
 	github.com/go-sql-driver/mysql v1.8.1
 	github.com/jinzhu/copier v0.4.0
