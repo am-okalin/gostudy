@@ -1,6 +1,7 @@
 package net
 
 import (
+	"net"
 	"syscall"
 	"testing"
 )
@@ -17,5 +18,5 @@ func TestSocket(t *testing.T) {
 }
 
 func TestRune(t *testing.T) {
-
+	_, _ = net.Listen("tcp", ":8080")
 }

@@ -1,0 +1,13 @@
+go 1.19
+
+use (
+	./0415
+	./algorithm
+	./basic
+	./cmd
+	./concurrent
+	./design
+	./dev
+	./gopkg
+	./structure
+)
