@@ -6,10 +6,10 @@ import (
 	"time"
 )
 
-//Token 令牌
+// Token 令牌
 type Token struct{}
 
-//TestDataTransferByToken 通过令牌进行数据传输
+// TestDataTransferByToken 通过令牌进行数据传输
 func TestDataTransferByToken(t *testing.T) {
 	dataTransferByToken()
 }
@@ -34,6 +34,6 @@ func dataTransferByToken() {
 	//首先把令牌交给第一个worker
 	chs[0] <- struct{}{}
 
-	// 阻塞主进程
+	// 阻塞主协程
 	select {}
 }

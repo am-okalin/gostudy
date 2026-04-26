@@ -1,4 +1,4 @@
-go 1.19
+go 1.24
 
 use (
 	./0415
@@ -7,7 +7,5 @@ use (
 	./cmd
 	./concurrent
 	./design
-	./dev
-	./gopkg
 	./structure
 )

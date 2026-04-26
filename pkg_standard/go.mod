@@ -1,6 +1,6 @@
 module pkg_standard
 
-go 1.18
+go 1.24
 
 require (
 	github.com/shurcooL/graphql v0.0.0-20230722043721-ed46e5a46466

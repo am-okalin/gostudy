@@ -1,6 +1,6 @@
 module pkg_third
 
-go 1.18
+go 1.24
 
 require (
 	github.com/aliyun/aliyun-oss-go-sdk v3.0.2+incompatible
