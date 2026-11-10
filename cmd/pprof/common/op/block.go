@@ -15,7 +15,7 @@ func BlockProfile() error {
 	var senderGroup sync.WaitGroup
 	senderGroup.Add(senderNum)
 	repeat := 50000
-	for j := 0; j < senderNum; j++ {
+	for range senderNum {
 		go send(ch1, &senderGroup, repeat)
 	}
 
@@ -26,7 +26,7 @@ func BlockProfile() error {
 
 	var receiverGroup sync.WaitGroup
 	receiverGroup.Add(receiverNum)
-	for j := 0; j < receiverNum; j++ {
+	for range receiverNum {
 		go receive(ch1, &receiverGroup)
 	}
 	receiverGroup.Wait()
@@ -36,7 +36,7 @@ func BlockProfile() error {
 func send(ch1 chan int, wg *sync.WaitGroup, repeat int) {
 	defer wg.Done()
 	time.Sleep(time.Millisecond * 10)
-	for k := 0; k < repeat; k++ {
+	for range repeat {
 		elem := rand.Intn(repeat)
 		ch1 <- elem
 	}

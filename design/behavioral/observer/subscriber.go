@@ -5,7 +5,7 @@ import (
 	"fmt"
 )
 
-//Subscriber 订阅者接口
+// Subscriber 订阅者接口
 type Subscriber interface {
 	update(ctx context.Context) //更新订阅者内容
 	getID() string              //获取订阅者ID

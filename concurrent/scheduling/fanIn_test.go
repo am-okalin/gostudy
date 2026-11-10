@@ -7,7 +7,7 @@ import (
 	"time"
 )
 
-func fanInReflect(inchs ...<-chan interface{}) <-chan interface{} {
+func fanInReflect(inchs ...<-chan any) <-chan any {
 	var cases []reflect.SelectCase
 	for _, inch := range inchs {
 		cases = append(cases, reflect.SelectCase{
@@ -16,7 +16,7 @@ func fanInReflect(inchs ...<-chan interface{}) <-chan interface{} {
 		})
 	}
 
-	outch := make(chan interface{})
+	outch := make(chan any)
 	go func() {
 		defer close(outch)
 		for len(cases) > 0 {
@@ -31,8 +31,8 @@ func fanInReflect(inchs ...<-chan interface{}) <-chan interface{} {
 	return outch
 }
 
-func Input(val int, d time.Duration) <-chan interface{} {
-	var inchan = make(chan interface{})
+func Input(val int, d time.Duration) <-chan any {
+	var inchan = make(chan any)
 	go func() {
 		defer close(inchan)
 		time.Sleep(d)

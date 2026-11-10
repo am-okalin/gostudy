@@ -12,7 +12,7 @@ var global [1024]byte
 func testPointers() []unsafe.Pointer {
 	var pointers []unsafe.Pointer
 	// globals
-	for i := 0; i < 10; i++ {
+	for i := range 10 {
 		pointers = append(pointers, unsafe.Pointer(&global[1<<i-1]))
 	}
 	// heap

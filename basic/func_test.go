@@ -13,7 +13,7 @@ var f1 = func() {
 	fmt.Println("this is f1")
 }
 
-//eat 独立的函数类型 可作为输入输出
+// eat 独立的函数类型 可作为输入输出
 type eat func(food string) (weight int)
 
 func getEatFruitFun() eat {

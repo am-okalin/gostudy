@@ -32,7 +32,7 @@ func frog2(n int, m map[int]int) int {
 // 自底向上
 func frog3(n int) int {
 	m := make(map[int]int)
-	for i := 0; i < n; i++ {
+	for i := range n {
 		if i == 1 {
 			m[i] = 1
 		} else if i == 2 {

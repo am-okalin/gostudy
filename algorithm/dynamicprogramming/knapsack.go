@@ -1,6 +1,6 @@
 package dynamicprogramming
 
-//knapsack1 动态规划解决01背包
+// knapsack1 动态规划解决01背包
 func knapsack1(w, n int, weight []int) int {
 	// 创建状态转移表
 	var status = make([][]bool, n)

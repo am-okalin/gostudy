@@ -33,14 +33,14 @@ func setValue(to, from reflect.Value) (err error) {
 }
 
 func indirect(reflectValue reflect.Value) reflect.Value {
-	for reflectValue.Kind() == reflect.Ptr {
+	for reflectValue.Kind() == reflect.Pointer {
 		reflectValue = reflectValue.Elem()
 	}
 	return reflectValue
 }
 
 func indirectType(reflectType reflect.Type) (_ reflect.Type, isPtr bool) {
-	for reflectType.Kind() == reflect.Ptr || reflectType.Kind() == reflect.Slice {
+	for reflectType.Kind() == reflect.Pointer || reflectType.Kind() == reflect.Slice {
 		reflectType = reflectType.Elem()
 		isPtr = true
 	}

@@ -24,7 +24,7 @@ func Test2(t *testing.T) {
 	var myLimiter = NewIPRateLimiter(0.3, 20)
 
 	n := 100
-	for i := 0; i < n; i++ {
+	for i := range n {
 		if !myLimiter.GetLimiter("127.0.0.1").Allow() {
 			t.Errorf("%d too many requests", i)
 			time.Sleep(time.Second)
@@ -40,9 +40,9 @@ func Test3(t *testing.T) {
 
 	saveMem("memprofile_1.prof")
 
-	for i1 := 0; i1 < 255; i1++ {
-		for i2 := 0; i2 < 255; i2++ {
-			for i3 := 0; i3 < 255; i3++ {
+	for i1 := range 255 {
+		for i2 := range 255 {
+			for i3 := range 255 {
 				//for i4 := 0; i4 < 255; i4++ {
 				ip := fmt.Sprintf("%d.%d.%d.%d", i1, i2, i3, 0)
 				if !myLimiter.GetLimiter(ip).Allow() {

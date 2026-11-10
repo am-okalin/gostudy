@@ -43,7 +43,8 @@ func Test2(t *testing.T) {
 	runtime.GOMAXPROCS(1)
 
 	num := 9
-	for i := 0; i < num; i++ {
+	// go1.22 起循环变量每次迭代都会重新声明，此处输出 0..8（1.21 及之前通常全是 8）
+	for i := range num {
 		go func() {
 			fmt.Println("go1: ", i) //block
 		}()

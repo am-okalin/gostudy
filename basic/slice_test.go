@@ -7,7 +7,7 @@ import (
 func TestArr(t *testing.T) {
 	//数组 定长不可变
 	var arr1 [10]int
-	for i := 0; i < 10; i++ {
+	for i := range 10 {
 		arr1[i] = 100 - i
 	}
 
@@ -25,7 +25,7 @@ func TestArr(t *testing.T) {
 
 func TestSlice(t *testing.T) {
 	var slice1 []int
-	for i := 0; i < 10; i++ {
+	for i := range 10 {
 		//当append后的数量超过cap后，会对底层数组进行扩容
 		//扩容规则为之前容量的2倍，当容量大于1000时，则扩容为1/4
 		slice1 = append(slice1, 100-i)

@@ -18,7 +18,7 @@ func (a Struct1) Param1() string {
 	return a.param1
 }
 
-//SetParam1 设置变量时的`receiver`必须为指针类型
+// SetParam1 设置变量时的`receiver`必须为指针类型
 func (a *Struct1) SetParam1(param1 string) {
 	a.param1 = param1
 }

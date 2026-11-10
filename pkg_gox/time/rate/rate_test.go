@@ -12,7 +12,7 @@ func TestLimiter(t *testing.T) {
 	// 创建一个速率限制器，每3秒创建1个令牌, 最多3个令牌
 	limiter := rate.NewLimiter(1.0/3.0, 3)
 
-	for i := 0; i < 10; i++ {
+	for i := range 10 {
 		if limiter.Allow() {
 			t.Log("success", i)
 		} else {
@@ -24,7 +24,7 @@ func TestLimiter(t *testing.T) {
 	// 等待10秒，恢复至最多3个令牌
 	time.Sleep(10 * time.Second)
 
-	for i := 0; i < 10; i++ {
+	for i := range 10 {
 		if limiter.Allow() {
 			t.Log("success", i)
 		} else {
@@ -42,7 +42,7 @@ func TestSometime(t *testing.T) {
 		Interval: 1 * time.Second, // 时间间隔为1秒, 每隔1秒执行一次
 	}
 
-	for i := 0; i < 100; i++ {
+	for range 100 {
 		s.Do(func() {
 			fmt.Println("Executing operation at", time.Now())
 		})

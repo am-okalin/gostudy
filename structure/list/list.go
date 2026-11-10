@@ -15,7 +15,7 @@ type List struct {
 	head *Elem
 }
 
-//get 获取第i个位置的元素
+// get 获取第i个位置的元素
 func (l *List) get(i int) *Elem {
 	//取第i个元素，只用快指针
 	slow, fast := l.head, l.head
@@ -39,13 +39,13 @@ func (l *List) get(i int) *Elem {
 	return slow
 }
 
-//insert 在第i个位置插入e
+// insert 在第i个位置插入e
 func (l *List) insert(e, at *Elem) {
 	e.next = at.next
 	at.next = e
 }
 
-//remove 删除at后的元素
+// remove 删除at后的元素
 func (l *List) removeAt(at *Elem) bool {
 	if at.next == nil {
 		return false
@@ -57,7 +57,7 @@ func (l *List) removeAt(at *Elem) bool {
 	return true
 }
 
-//reverse 链表反转
+// reverse 链表反转
 func (l *List) reverse() {
 	if l.head == nil || l.head.next == nil {
 		return
@@ -74,7 +74,7 @@ func (l *List) reverse() {
 	l.head = left
 }
 
-//hasCycle 检测是否有环
+// hasCycle 检测是否有环
 func (l *List) hasCycle() bool {
 	if l.head != nil {
 		slow, fast := l.head, l.head
@@ -89,7 +89,7 @@ func (l *List) hasCycle() bool {
 	return false
 }
 
-//middle 返回中间元素
+// middle 返回中间元素
 func (l *List) middle() *Elem {
 	slow, fast := l.head, l.head
 	if l.head != nil {

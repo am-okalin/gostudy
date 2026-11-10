@@ -16,7 +16,7 @@ type box struct {
 func MemProfile() error {
 	max := 50000
 	var buf bytes.Buffer
-	for j := 0; j < max; j++ {
+	for range max {
 		seed := rand.Intn(95) + 32
 		one := createBox(seed)
 		b, err := genJSON(one)
@@ -36,7 +36,7 @@ func createBox(seed int) box {
 	}
 	var array []byte
 	size := seed * 8
-	for i := 0; i < size; i++ {
+	for range size {
 		array = append(array, byte(seed))
 	}
 	return box{

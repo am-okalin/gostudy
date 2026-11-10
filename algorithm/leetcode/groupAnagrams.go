@@ -1,6 +1,6 @@
 package leetcode
 
-import "sort"
+import "slices"
 
 func groupAnagrams(strs []string) [][]string {
 	// 空判断
@@ -16,9 +16,7 @@ func groupAnagrams(strs []string) [][]string {
 	for _, str := range strs {
 		// 排序找出 zmywc.key
 		rs := []rune(str)
-		sort.Slice(rs, func(i, j int) bool {
-			return rs[i] < rs[j]
-		})
+		slices.Sort(rs)
 
 		// 加入maps
 		rss := string(rs)

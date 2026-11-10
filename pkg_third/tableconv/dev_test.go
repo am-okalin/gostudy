@@ -5,7 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/am-okalin/kit/tableconv"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"testing"
 )
@@ -127,7 +127,7 @@ func mc(table [][]string) error {
 	}
 	defer res.Body.Close()
 
-	body, err := ioutil.ReadAll(res.Body)
+	body, err := io.ReadAll(res.Body)
 	if err != nil {
 		return err
 	}

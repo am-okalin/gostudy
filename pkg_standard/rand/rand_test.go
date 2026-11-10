@@ -13,7 +13,7 @@ import (
 
 // 真随机, 性能慢
 func Test2(t *testing.T) {
-	for i := 0; i < 4; i++ {
+	for range 4 {
 		n, _ := rand.Int(rand.Reader, big.NewInt(100))
 		println(n.Int64())
 	}
@@ -22,7 +22,7 @@ func Test2(t *testing.T) {
 // 伪随机, 需要独立的seed
 func Test1(t *testing.T) {
 	//mr.Seed(time.Now().UnixNano())
-	for i := 0; i < 3; i++ {
+	for range 3 {
 		println(mr.Intn(10))
 	}
 	println(mr.Intn(10))
@@ -38,7 +38,7 @@ func GenerateRandomSteps(length int) string {
 	charsetLength := big.NewInt(int64(len(charset)))
 
 	steps := make([]byte, length)
-	for i := 0; i < length; i++ {
+	for i := range length {
 		randomIndex, _ := rand.Int(rand.Reader, charsetLength)
 		steps[i] = charset[randomIndex.Int64()]
 	}

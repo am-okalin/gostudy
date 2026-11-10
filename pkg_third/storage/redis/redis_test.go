@@ -77,7 +77,7 @@ func TestSortSet(t *testing.T) {
 	zk1 := "zk1"
 
 	var zl []*redis.Z
-	for i := 0; i < 5; i++ {
+	for i := range 5 {
 		zl = append(zl, &redis.Z{
 			Score:  float64(i),
 			Member: fmt.Sprintf("member_%d", i),

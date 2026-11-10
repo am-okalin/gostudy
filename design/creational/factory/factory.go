@@ -9,19 +9,19 @@ const (
 	B
 )
 
-//Product 产品接口
+// Product 产品接口
 type Product interface {
 	getPrice() int
 }
 
-//BaseProduct 基础产品
+// BaseProduct 基础产品
 type BaseProduct struct{}
 
 func (base BaseProduct) getPrice() int {
 	return 10
 }
 
-//ProductA 产品A组合了基础产品
+// ProductA 产品A组合了基础产品
 type ProductA struct {
 	BaseProduct
 }

@@ -8,8 +8,8 @@ import (
 )
 
 // 返回c并在执行函数后关闭c
-func sig(after time.Duration) <-chan interface{} {
-	c := make(chan interface{})
+func sig(after time.Duration) <-chan any {
+	c := make(chan any)
 	go func() {
 		defer close(c)
 		time.Sleep(after)
@@ -45,8 +45,8 @@ func TestOrs(t *testing.T) {
 	fmt.Printf("done after %v", time.Since(start))
 }
 
-//orr 递归方式的orDone
-func orr(channels ...<-chan interface{}) <-chan interface{} {
+// orr 递归方式的orDone
+func orr(channels ...<-chan any) <-chan any {
 	// 特殊情况，只有零个或者1个chan
 	switch len(channels) {
 	case 0:
@@ -55,7 +55,7 @@ func orr(channels ...<-chan interface{}) <-chan interface{} {
 		return channels[0]
 	}
 
-	orDone := make(chan interface{})
+	orDone := make(chan any)
 	go func() {
 		defer close(orDone)
 
@@ -77,13 +77,13 @@ func orr(channels ...<-chan interface{}) <-chan interface{} {
 	return orDone
 }
 
-//ors select方式的orDone
-func ors(chans ...<-chan interface{}) <-chan interface{} {
+// ors select方式的orDone
+func ors(chans ...<-chan any) <-chan any {
 	if len(chans) == 0 {
 		return nil
 	}
 
-	orDone := make(chan interface{})
+	orDone := make(chan any)
 
 	go func() {
 		defer close(orDone)

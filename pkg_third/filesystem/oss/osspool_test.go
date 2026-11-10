@@ -1,7 +1,7 @@
 package oss
 
 import (
-	"io/ioutil"
+	"io"
 	"strings"
 	"testing"
 )
@@ -35,7 +35,7 @@ func Test1(t *testing.T) {
 	defer stream.Close()
 	// 解析下载文件
 	var res []byte
-	res, err = ioutil.ReadAll(stream)
+	res, err = io.ReadAll(stream)
 	if err != nil {
 		return
 	}

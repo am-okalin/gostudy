@@ -20,7 +20,7 @@ func (t T) isempty() bool {
 func Consume1(list []T, n int) error {
 	// list的数据写入队列
 	ch := make(chan T, len(list))
-	for i := 0; i < len(list); i++ {
+	for i := range list {
 		ch <- list[i]
 	}
 	close(ch)
@@ -28,7 +28,7 @@ func Consume1(list []T, n int) error {
 	// 多线程从chs中消费数据
 	wg := sync.WaitGroup{}
 	wg.Add(n)
-	for i := 0; i < n; i++ {
+	for i := range n {
 		go func(i int) {
 			defer func() {
 				wg.Done()

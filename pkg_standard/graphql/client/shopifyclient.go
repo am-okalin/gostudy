@@ -7,8 +7,8 @@ import (
 )
 
 type GraphQLReq struct {
-	Query     string      `json:"query"`
-	Variables interface{} `json:"variables"`
+	Query     string `json:"query"`
+	Variables any    `json:"variables"`
 }
 
 type ShopifyClient struct {

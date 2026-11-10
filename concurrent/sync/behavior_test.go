@@ -7,7 +7,7 @@ import (
 
 func TestBehavior(t *testing.T) {
 	var list []string
-	for i := 0; i < 100; i++ {
+	for i := range 100 {
 		list = append(list, fmt.Sprintf("string %v", i))
 	}
 
@@ -19,7 +19,7 @@ func TestBehavior(t *testing.T) {
 
 func TestConsume1(t *testing.T) {
 	var list []T
-	for i := 0; i < 100; i++ {
+	for i := range 100 {
 		list = append(list, T{
 			a: i,
 			b: "",

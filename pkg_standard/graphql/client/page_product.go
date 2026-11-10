@@ -4,7 +4,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
+	"io"
 )
 
 type PageProductsRes struct {
@@ -56,7 +56,7 @@ func (a *PageProducts) request() error {
 		return err
 	}
 
-	resBytes, err := ioutil.ReadAll(res.Body)
+	resBytes, err := io.ReadAll(res.Body)
 	if err != nil {
 		return err
 	}

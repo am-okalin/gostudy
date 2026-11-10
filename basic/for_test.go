@@ -15,7 +15,7 @@ func getList(n int) []Item {
 	fmt.Println("getList()")
 
 	data := make([]Item, n)
-	for i := 0; i < n; i++ {
+	for i := range n {
 		data[i].Value1 = strconv.Itoa(i) + "-string"
 		data[i].Value2 = i
 	}

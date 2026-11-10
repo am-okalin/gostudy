@@ -4,7 +4,7 @@ package main
 import (
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"log"
 	"net/http"
 	"sync"
@@ -40,12 +40,12 @@ type person struct {
 	Age  int    `json:"age"`
 }
 
-// poster 输入姓民年龄，返回请求信息
+// poster 输入姓名年龄，返回请求信息
 func poster(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprintln(w, r.URL, r.Method)
 
 	var p person
-	buf, _ := ioutil.ReadAll(r.Body)
+	buf, _ := io.ReadAll(r.Body)
 	err := json.Unmarshal(buf, &p)
 	if err != nil {
 		log.Println(err)

@@ -9,7 +9,7 @@ import (
 	"time"
 )
 
-//Producer, consumer
+// Producer, consumer
 func InCh(chs []chan string, list []string) {
 	// 数据输入完毕后关闭chs
 	defer func() {
@@ -21,8 +21,8 @@ func InCh(chs []chan string, list []string) {
 	// 循环喂数据(block)
 	chslen := len(chs)
 	inCases := make([]reflect.SelectCase, chslen)
-	for i := 0; i < len(list); i++ {
-		for j := 0; j < len(chs); j++ {
+	for i := range list {
+		for j := range chs {
 			//实现 case: chs[i%n]<-v
 			inCases[j%chslen] = reflect.SelectCase{
 				Dir:  reflect.SelectSend,
@@ -51,7 +51,7 @@ func OutCh(chs []chan string, i int, wg *sync.WaitGroup) {
 func Consume(list []string, n int) error {
 	// 创建无缓存的chan
 	chs := make([]chan string, n)
-	for i := 0; i < n; i++ {
+	for i := range n {
 		chs[i] = make(chan string)
 	}
 
@@ -61,7 +61,7 @@ func Consume(list []string, n int) error {
 	// 多线程从chs中消费数据
 	wg := sync.WaitGroup{}
 	wg.Add(len(chs))
-	for i := 0; i < n; i++ {
+	for i := range n {
 		go OutCh(chs, i, &wg)
 	}
 

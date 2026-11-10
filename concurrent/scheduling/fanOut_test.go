@@ -7,10 +7,10 @@ import (
 )
 
 func TestFanOut(t *testing.T) {
-	var inch = make(chan interface{})
-	var outchs []chan interface{}
-	for i := 0; i < 5; i++ {
-		outchs = append(outchs, make(chan interface{}))
+	var inch = make(chan any)
+	var outchs []chan any
+	for range 5 {
+		outchs = append(outchs, make(chan any))
 	}
 	fanOut(true, inch, outchs)
 
@@ -24,17 +24,17 @@ func TestFanOut(t *testing.T) {
 	fmt.Println(val3, val4)
 }
 
-func fanOut(sync bool, inch chan interface{}, outchs []chan interface{}) {
+func fanOut(sync bool, inch chan any, outchs []chan any) {
 	go func() {
 		defer func() {
-			for i := 0; i < len(outchs); i++ {
+			for i := range outchs {
 				close(outchs[i])
 			}
 		}()
 
 		for val := range inch {
-			for i := 0; i < len(outchs); i++ {
-				i := i //给局部变量新的地址
+			for i := range outchs {
+				// go1.22 起循环变量每次迭代都会重新声明，无需再写 i := i 取新地址
 				go func() {
 					outchs[i] <- val
 				}()

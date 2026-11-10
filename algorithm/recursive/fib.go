@@ -1,6 +1,6 @@
 package recursive
 
-//Fib1 递归
+// Fib1 递归
 func Fib1(n int) int {
 	if n == 1 {
 		return 1
@@ -11,7 +11,7 @@ func Fib1(n int) int {
 	return Fib1(n-1) + Fib1(n-2)
 }
 
-//Fib2 尾递归
+// Fib2 尾递归
 func Fib2(n, first, second int) int {
 	if n == 1 {
 		return second
@@ -20,7 +20,7 @@ func Fib2(n, first, second int) int {
 	return Fib2(n-1, second, first+second)
 }
 
-//Fib3 尾递归 抽象版-记录每个迭代结果集
+// Fib3 尾递归 抽象版-记录每个迭代结果集
 func Fib3(n int, sum *[]int) int {
 	l := len(*sum)
 
@@ -34,7 +34,7 @@ func Fib3(n int, sum *[]int) int {
 	return Fib3(n-1, sum)
 }
 
-//Fib4 递归+备忘录
+// Fib4 递归+备忘录
 func Fib4(n int, memo map[int]int) int {
 	if n == 1 {
 		return 1
@@ -52,7 +52,7 @@ func Fib4(n int, memo map[int]int) int {
 	return memo[n]
 }
 
-//Fib5 循环
+// Fib5 循环
 func Fib5(n int) int {
 	sum := []int{0, 1}
 

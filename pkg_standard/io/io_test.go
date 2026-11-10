@@ -34,7 +34,7 @@ func TestCopyBuffer(t *testing.T) {
 	t.Log(nr)
 }
 
-//对 io.ReadAll(r) 方法的测试
+// 对 io.ReadAll(r) 方法的测试
 func TestReader(t *testing.T) {
 	b := make([]byte, 0, 512)
 	b = append(b, []byte("ab")...)

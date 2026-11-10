@@ -21,14 +21,14 @@ func TestChInit(t *testing.T) {
 	// len返回缓存中的元素数量， cap返回缓存容量
 	t.Log(ch2, len(ch2), cap(ch2))
 	//创建双向[]chan
-	var chs1 []chan interface{}
+	var chs1 []chan any
 	//会在第一次扩容时初始化chs1
-	for i := 0; i < num; i++ {
-		chs1 = append(chs1, make(chan interface{}))
+	for range num {
+		chs1 = append(chs1, make(chan any))
 	}
 	t.Log(len(chs1), cap(chs1))
 	//初始化双向[]chan
-	chs2 := make([]chan interface{}, num)
+	chs2 := make([]chan any, num)
 	t.Log(len(chs2), cap(chs2))
 }
 
@@ -46,7 +46,7 @@ func TestSelect(t *testing.T) {
 func TestChFor(t *testing.T) {
 	// 使用select
 	var ch = make(chan int, 10)
-	for i := 0; i < 5; i++ {
+	for i := range 5 {
 		select {
 		case ch <- i:
 			fmt.Println("in : ", i)
@@ -120,7 +120,7 @@ func TestChClose(t *testing.T) {
 	go func() {
 		time.Sleep(1 * time.Second)
 		//当队列空后返回零值
-		for i := 0; i < 5; i++ {
+		for range 5 {
 			t.Log(<-ch2)
 		}
 	}()
@@ -148,7 +148,7 @@ func TestCh2(t *testing.T) {
 	num := 10
 	ch := make(chan string, num)
 	go func() {
-		for i := 0; i < num; i++ {
+		for i := range num {
 			ch <- fmt.Sprintf("a%d", i)
 			t.Logf("in:a%d", i)
 			time.Sleep(time.Second)
@@ -157,7 +157,7 @@ func TestCh2(t *testing.T) {
 	}()
 
 	go func() {
-		for i := 0; i < num; i++ {
+		for range num {
 			v := <-ch
 			t.Logf("out:%s", v)
 			//time.Sleep(time.Second)
@@ -171,10 +171,10 @@ func TestCh3(t *testing.T) {
 	num := 10
 	sign := make(chan struct{}, num)
 
-	//猜猜输出什么
-	for i := 0; i < num; i++ {
+	// 猜猜输出什么：go1.22 起循环变量每次迭代都会重新声明，因此输出 0..9（1.21 及之前通常全是 10）
+	for i := range num {
 		go func() {
-			//子goruntine在运行到这一行时才拿i的值进行输出
+			// 子 goroutine 运行时读取的是本次迭代的 i（go1.22+）
 			fmt.Println(i)
 			sign <- struct{}{}
 		}()
@@ -183,13 +183,13 @@ func TestCh3(t *testing.T) {
 	//阻塞进程的方式有 select for-range time.sleep sync.wait chan
 	//select {}
 	//time.Sleep(time.Millisecond * 500)
-	for j := 0; j < num; j++ {
+	for range num {
 		<-sign
 	}
 }
 
 func TestCh4(t *testing.T) {
-	for i := uint32(0); i < 10; i++ {
+	for i := range uint32(10) {
 		// 如此的话会先对子goruntine的形参会先求值
 		go func(i uint32) {
 			fn := func() {
@@ -202,11 +202,11 @@ func TestCh4(t *testing.T) {
 }
 
 func trigger(i uint32, fn func()) {
-	var count uint32
+	var count atomic.Uint32
 	for {
-		if n := atomic.LoadUint32(&count); n == i {
+		if n := count.Load(); n == i {
 			fn()
-			atomic.AddUint32(&count, 1)
+			count.Add(1)
 			break
 		}
 		time.Sleep(time.Nanosecond)

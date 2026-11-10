@@ -40,7 +40,7 @@ func doSomething() {
 	size := 10000000
 	randomNumbers := make([]int, size)
 	max := int32(size)
-	for i := 0; i < size; i++ {
+	for i := range size {
 		target := rand.Int31n(max)
 		randomNumbers[target] = i
 	}

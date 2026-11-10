@@ -3,7 +3,6 @@ package net
 import (
 	"bufio"
 	"io"
-	"io/ioutil"
 	"net"
 	"net/http"
 	"testing"
@@ -21,7 +20,7 @@ func TestHttpGet(t *testing.T) {
 	defer resp.Body.Close()
 
 	// 取出返回body
-	body, err := ioutil.ReadAll(resp.Body)
+	body, err := io.ReadAll(resp.Body)
 	if err != nil {
 		t.Logf("request sending error: %v\n", err)
 		return

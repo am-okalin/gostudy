@@ -6,10 +6,10 @@ import (
 	"time"
 )
 
-func initChs(num int) []chan interface{} {
-	var chs = make([]chan interface{}, 0)
-	for i := 0; i < num; i++ {
-		chs = append(chs, make(chan interface{}, 10))
+func initChs(num int) []chan any {
+	var chs = make([]chan any, 0)
+	for range num {
+		chs = append(chs, make(chan any, 10))
 	}
 	return chs
 }

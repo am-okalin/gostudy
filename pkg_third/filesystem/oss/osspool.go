@@ -22,10 +22,10 @@ type OssPool struct {
 var lazy *OssPool
 var once = &sync.Once{}
 
-//NewOssPool 懒汉单例(lazy load signal)创建ossClient
+// NewOssPool 懒汉单例(lazy load signal)创建ossClient
 func NewOssPool(endpoint, bucket, workdir, accessID, accessSecret string) *OssPool {
 	once.Do(func() {
-		lazy = &OssPool{endpoint: endpoint, bucket: bucket, workdir: workdir, pool: &sync.Pool{New: func() interface{} {
+		lazy = &OssPool{endpoint: endpoint, bucket: bucket, workdir: workdir, pool: &sync.Pool{New: func() any {
 			client, err := oss.New(endpoint, accessID, accessSecret)
 			if err != nil {
 				log.Fatal(err)
@@ -41,14 +41,14 @@ func (p OssPool) GetWorkDir() string {
 	return p.workdir
 }
 
-//GetFullPath 获取文件的完整路径
+// GetFullPath 获取文件的完整路径
 func (p OssPool) GetFullPath(filepath string) string {
 	return "https://" + p.bucket + "." + p.endpoint + "/" + p.workdir + filepath
 }
 
 //todo::提供bucket供外部使用并回收
 
-//UploadFile 上传文件流
+// UploadFile 上传文件流
 func (p *OssPool) UploadFile(from, to string, options ...oss.Option) error {
 	//创建实例
 	c := p.pool.Get().(*oss.Client)
@@ -74,7 +74,7 @@ func (p *OssPool) UploadFile(from, to string, options ...oss.Option) error {
 	return nil
 }
 
-//UploadStream 上传文件流
+// UploadStream 上传文件流
 func (p *OssPool) UploadStream(objectName string, r io.Reader) error {
 	//创建实例
 	c := p.pool.Get().(*oss.Client)
@@ -100,7 +100,7 @@ func (p *OssPool) UploadStream(objectName string, r io.Reader) error {
 	return nil
 }
 
-//DownloadStream 下载文件流
+// DownloadStream 下载文件流
 func (p *OssPool) DownloadStream(objectName string) (io.ReadCloser, error) {
 	//创建实例
 	c := p.pool.Get().(*oss.Client)
@@ -126,7 +126,7 @@ func (p *OssPool) DownloadStream(objectName string) (io.ReadCloser, error) {
 	return r, nil
 }
 
-//DownloadToFile 下载到本地文件
+// DownloadToFile 下载到本地文件
 func (p *OssPool) DownloadToFile(objectName string, localPath string) error {
 	//创建实例
 	c := p.pool.Get().(*oss.Client)
@@ -152,7 +152,7 @@ func (p *OssPool) DownloadToFile(objectName string, localPath string) error {
 	return nil
 }
 
-//GetMate 获取文件信息
+// GetMate 获取文件信息
 func (p *OssPool) GetMate(objectName string) (http.Header, error) {
 	//创建实例
 	c := p.pool.Get().(*oss.Client)
@@ -187,7 +187,7 @@ type File struct {
 	LastModified time.Time `json:"last_modified"`
 }
 
-//ListObject 列出目录下所有文件
+// ListObject 列出目录下所有文件
 func (p *OssPool) ListObject(dir string) ([]*File, error) {
 	//创建实例
 	c := p.pool.Get().(*oss.Client)
@@ -251,7 +251,7 @@ func (fs Files) Less(i, j int) bool {
 	return fs[i].LastModified.Unix() > fs[j].LastModified.Unix()
 }
 
-//FormatFileSize 格式化文件字节大小
+// FormatFileSize 格式化文件字节大小
 func FormatFileSize(fileSize int64) (size string) {
 	if fileSize < 1024 {
 		//return strconv.FormatInt(fileSize, 10) + "B"

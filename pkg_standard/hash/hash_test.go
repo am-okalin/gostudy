@@ -38,7 +38,7 @@ func Test1(t *testing.T) {
 	h2 := tt.new()
 	h3 := tt.new()
 	const split = 249
-	for i := 0; i < split; i++ {
+	for i := range split {
 		h2.Write(buf[i : i+1])
 	}
 	h2m, ok := h2.(encoding.BinaryMarshaler)

@@ -21,7 +21,7 @@ func generateTestPayload() []byte {
 	buffer := &bytes.Buffer{}
 	encoder := json.NewEncoder(buffer)
 	encoder.SetEscapeHTML(false)
-	_ = encoder.Encode([]map[string]interface{}{
+	_ = encoder.Encode([]map[string]any{
 		{
 			"email":         "hello@world.com",
 			"event":         "dropped",

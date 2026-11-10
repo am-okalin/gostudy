@@ -9,7 +9,7 @@ import (
 func CPUProfile() error {
 	max := 10000000
 	var buf bytes.Buffer
-	for j := 0; j < max; j++ {
+	for range max {
 		num := rand.Int63n(int64(max))
 		str := strconv.FormatInt(num, 10)
 		buf.WriteString(str)

@@ -1,6 +1,7 @@
 package basic
 
 import (
+	"maps"
 	"sync/atomic"
 	"testing"
 )
@@ -35,9 +36,7 @@ func TestCopyM(t *testing.T) {
 
 	// 深拷贝，不共用底层
 	c := make(map[int]bool)
-	for i, f := range a {
-		c[i] = f
-	}
+	maps.Copy(c, a)
 	c[3] = true
 	t.Log(a, b, c)
 }

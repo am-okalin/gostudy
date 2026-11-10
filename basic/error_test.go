@@ -6,7 +6,7 @@ import (
 	"testing"
 )
 
-//哨兵
+// 哨兵
 var ErrNotFound = errors.New("not found")
 
 func doSomethingPanic() string {

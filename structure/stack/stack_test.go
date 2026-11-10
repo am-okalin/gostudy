@@ -5,7 +5,7 @@ import (
 	"testing"
 )
 
-//matchBrackets 匹配括号
+// matchBrackets 匹配括号
 func matchBrackets(brackets string) bool {
 	m := map[rune]rune{')': '(', ']': '[', '}': '{'}
 	rs := stack{cap: 32, data: make([]any, 0, 32)}

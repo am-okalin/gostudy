@@ -5,7 +5,6 @@ import (
 	"github.com/aws/aws-sdk-go-v2/feature/s3/manager"
 	"github.com/aws/aws-sdk-go-v2/service/s3"
 	"github.com/aws/aws-sdk-go-v2/service/s3/types"
-	"github.com/aws/aws-sdk-go/aws"
 	"github.com/rs/xid"
 	"os"
 	"testing"
@@ -36,8 +35,8 @@ func TestManager(t *testing.T) {
 	//初始化上传者
 	uploader := manager.NewUploader(client)
 	result, err := uploader.Upload(context.TODO(), &s3.PutObjectInput{
-		Bucket: aws.String(awsConf.Bucket),
-		Key:    aws.String("my-object-key"),
+		Bucket: new(awsConf.Bucket),
+		Key:    new("my-object-key"),
 		Body:   file,
 	})
 	t.Log(result, err)
@@ -52,7 +51,7 @@ func TestBucketSign(t *testing.T) {
 	conf.Bucket = "wtn-test"
 	//创建bucket
 	_, err = client.CreateBucket(context.TODO(), &s3.CreateBucketInput{
-		Bucket:                    aws.String(conf.Bucket),
+		Bucket:                    new(conf.Bucket),
 		ACL:                       types.BucketCannedACLAuthenticatedRead,
 		CreateBucketConfiguration: &types.CreateBucketConfiguration{LocationConstraint: types.BucketLocationConstraint(conf.Region)},
 	})
@@ -96,7 +95,7 @@ func TestPublicAccessBlock(t *testing.T) {
 	client := getClient(conf)
 
 	block, err := client.GetPublicAccessBlock(context.TODO(), &s3.GetPublicAccessBlockInput{
-		Bucket: aws.String(conf.Bucket),
+		Bucket: new(conf.Bucket),
 	})
 	t.Log(block, err)
 }
@@ -106,13 +105,13 @@ func TestBucketPolicy(t *testing.T) {
 	client := getClient(conf)
 
 	policy, err := client.GetBucketPolicy(context.TODO(), &s3.GetBucketPolicyInput{
-		Bucket: aws.String(conf.Bucket),
+		Bucket: new(conf.Bucket),
 	})
 
 	t.Log(policy, err)
 
 	status, err := client.GetBucketPolicyStatus(context.TODO(), &s3.GetBucketPolicyStatusInput{
-		Bucket: aws.String(conf.Bucket),
+		Bucket: new(conf.Bucket),
 	})
 
 	t.Log(status, err)

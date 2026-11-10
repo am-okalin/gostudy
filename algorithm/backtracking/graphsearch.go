@@ -5,13 +5,13 @@ import (
 	"fmt"
 )
 
-//adjacency table, 无向图
+// adjacency table, 无向图
 type Graph struct {
 	adj []*list.List
 	v   int
 }
 
-//init graphh according to capacity
+// init graphh according to capacity
 func newGraph(v int) *Graph {
 	graphh := &Graph{}
 	graphh.v = v
@@ -22,13 +22,13 @@ func newGraph(v int) *Graph {
 	return graphh
 }
 
-//insert as add edge，一条边存2次
+// insert as add edge，一条边存2次
 func (self *Graph) addEdge(s int, t int) {
 	self.adj[s].PushBack(t)
 	self.adj[t].PushBack(s)
 }
 
-//search path by BFS
+// search path by BFS
 func (self *Graph) BFS(s int, t int) {
 
 	//todo
@@ -74,7 +74,7 @@ func (self *Graph) BFS(s int, t int) {
 
 }
 
-//search by DFS
+// search by DFS
 func (self *Graph) DFS(s int, t int) {
 
 	prev := make([]int, self.v)
@@ -91,7 +91,7 @@ func (self *Graph) DFS(s int, t int) {
 	printPrev(prev, s, t)
 }
 
-//recursivly find path
+// recursivly find path
 func (self *Graph) recurse(s int, t int, prev []int, visited []bool, isFound bool) {
 
 	if isFound {
@@ -116,7 +116,7 @@ func (self *Graph) recurse(s int, t int, prev []int, visited []bool, isFound boo
 
 }
 
-//print path recursively
+// print path recursively
 func printPrev(prev []int, s int, t int) {
 
 	if t == s || prev[t] == -1 {

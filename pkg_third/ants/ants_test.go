@@ -33,7 +33,7 @@ func demoFunc() {
 	time.Sleep(time.Duration(10) * time.Millisecond)
 }
 
-func demoPoolFunc(args interface{}) {
+func demoPoolFunc(args any) {
 	n := args.(int)
 	time.Sleep(time.Duration(n) * time.Millisecond)
 }
@@ -42,7 +42,7 @@ func Test1(t *testing.T) {
 	p, _ := ants.NewPool(10)
 	defer p.Release()
 
-	for i := 0; i < 1000; i++ {
+	for range 1000 {
 		_ = p.Submit(func() {
 			time.Sleep(time.Second)
 			fmt.Println("do submit")
@@ -57,7 +57,7 @@ func TestAntsPoolGetWorkerFromCache(t *testing.T) {
 	p, _ := ants.NewPool(AntsSize)
 	defer p.Release()
 
-	for i := 0; i < TestSize; i++ {
+	for range TestSize {
 		_ = p.Submit(demoFunc)
 	}
 	time.Sleep(2 * ants.DefaultCleanIntervalTime)
@@ -74,7 +74,7 @@ func TestAntsPoolWithFuncGetWorkerFromCachePreMalloc(t *testing.T) {
 	p, _ := ants.NewPoolWithFunc(TestSize, demoPoolFunc, ants.WithPreAlloc(true))
 	defer p.Release()
 
-	for i := 0; i < AntsSize; i++ {
+	for range AntsSize {
 		_ = p.Invoke(dur)
 	}
 	time.Sleep(2 * ants.DefaultCleanIntervalTime)

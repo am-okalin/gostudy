@@ -28,7 +28,7 @@ func Execute(op OpFunc, times int) (err error) {
 		}
 	}()
 	t1 = time.Now()
-	for i := 0; i < times; i++ {
+	for range times {
 		if err = op(); err != nil {
 			return
 		}

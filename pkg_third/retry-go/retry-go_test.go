@@ -3,7 +3,7 @@ package retry_go
 import (
 	"fmt"
 	"github.com/avast/retry-go"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"testing"
 	"time"
@@ -27,7 +27,7 @@ func Test1(t *testing.T) {
 				return err
 			}
 			defer resp.Body.Close()
-			body, err = ioutil.ReadAll(resp.Body)
+			body, err = io.ReadAll(resp.Body)
 			return err
 		},
 		//重试次数

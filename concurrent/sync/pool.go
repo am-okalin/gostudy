@@ -8,7 +8,7 @@ import (
 	"time"
 )
 
-var buffers = sync.Pool{New: func() interface{} {
+var buffers = sync.Pool{New: func() any {
 	return new(bytes.Buffer)
 }}
 
@@ -27,7 +27,7 @@ func wp() {
 	pool := pond.New(10, 100)
 
 	// Submit 1000 tasks
-	for i := 0; i < 100; i++ {
+	for i := range 100 {
 		n := i
 		pool.Submit(func() {
 			time.Sleep(1 * time.Second)

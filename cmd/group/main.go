@@ -64,7 +64,7 @@ func (s *peoples) Mod() {
 	}
 }
 
-//main go run main.go a,b,c,e f,g,h
+// main go run main.go a,b,c,e f,g,h
 func main() {
 	males := peoples(group(strings.Split(os.Args[1], ","), SexMale))
 	females := peoples(group(strings.Split(os.Args[2], ","), SexFemale))

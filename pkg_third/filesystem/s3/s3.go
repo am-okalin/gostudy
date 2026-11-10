@@ -39,7 +39,7 @@ func getClient(conf *conf.AWS) *s3.Client {
 	return s3.NewFromConfig(cfg)
 }
 
-//upload 用client将filepath上传到bucket，并命名为key
+// upload 用client将filepath上传到bucket，并命名为key
 func upload(client s3.Client, filepath, bucket, key string) error {
 	stat, err := os.Stat(filepath)
 	if err != nil {
@@ -67,7 +67,7 @@ func URL(region, bucket, key string) string {
 	return fmt.Sprintf("https://%s.s3.%s.amazonaws.com/%s", bucket, region, key)
 }
 
-//presignURL Get a presigned URL for the object. In order to get a presigned URL for an object, you must create a Presignclient
+// presignURL Get a presigned URL for the object. In order to get a presigned URL for an object, you must create a Presignclient
 func presignURL(client s3.Client, bucket, key string) (string, error) {
 	//创建预签名对象
 	presignClient := s3.NewPresignClient(&client)

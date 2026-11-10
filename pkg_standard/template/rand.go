@@ -23,7 +23,7 @@ func getKey(t reflect.StructField, tagName string) string {
 }
 
 // Render 从结构体渲染到变量
-func Render(str string, variables interface{}, left, right string) string {
+func Render(str string, variables any, left, right string) string {
 	t, v := reflect.TypeOf(variables), reflect.ValueOf(variables)
 	if v.Elem().Kind() == reflect.Struct {
 		t, v = t.Elem(), v.Elem()

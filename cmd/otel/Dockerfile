@@ -1,0 +1,4 @@
+FROM alpine:3.20
+ARG SERVICE
+COPY bin/${SERVICE} /app
+ENTRYPOINT ["/app"]

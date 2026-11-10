@@ -1,6 +1,6 @@
 module concurrent
 
-go 1.18
+go 1.27.3
 
 require (
 	github.com/alitto/pond v1.8.0

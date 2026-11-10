@@ -5,7 +5,7 @@ import (
 	"testing"
 )
 
-//合并[]byte
+// 合并[]byte
 func TestMerge(t *testing.T) {
 	str := "01"
 	byt := []byte(str)

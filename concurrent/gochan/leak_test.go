@@ -25,7 +25,7 @@ func process(timeout time.Duration) bool {
 	}
 }
 
-//模拟chan导致的goroutine泄露
+// 模拟chan导致的goroutine泄露
 func TestLeak(t *testing.T) {
 	process(2 * time.Second)
 }

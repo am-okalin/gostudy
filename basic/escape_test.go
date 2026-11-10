@@ -22,7 +22,7 @@ func e2() *data {
 	return &d
 }
 
-//todo::执行命令做逃逸分析
+// todo::执行命令做逃逸分析
 func TestEscape(t *testing.T) {
 	d1 := e1()
 	fmt.Printf("%p\n", &d1)

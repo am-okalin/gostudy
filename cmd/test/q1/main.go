@@ -24,16 +24,16 @@ type ClickEvent struct {
 	// Language Accept-Language 没有就不传
 	Language string `json:"language,omitempty"`
 	// ClickedAt 创建时间, iso8601
-	ClickedAt time.Time `json:"clicked_at,omitempty"`
+	ClickedAt time.Time `json:"clicked_at"`
 	// Metadata 元数据, 本项目无内容
-	Metadata interface{} `json:"metadata,omitempty"`
+	Metadata any `json:"metadata,omitempty"`
 }
 
 func main() {
 	var memStats runtime.MemStats
 	runtime.ReadMemStats(&memStats)
 
-	for i := 0; i < 1000; i++ {
+	for range 1000 {
 		go func() {
 			do := &ClickEvent{
 				Hostname:  "localhost:8000",
