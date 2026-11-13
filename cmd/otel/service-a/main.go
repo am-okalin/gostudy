@@ -12,7 +12,7 @@ import (
 	"syscall"
 	"time"
 
-	"cmd/otel/internal/telemetry"
+	"cmd/otel/pkg/telemetry"
 
 	"github.com/redis/go-redis/v9"
 	"github.com/segmentio/kafka-go"

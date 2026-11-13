@@ -67,7 +67,7 @@ curl http://localhost:18080/order/1   # 连打两次，第二次命中 Redis 缓
 | `Dockerfile` | 多阶段构建（golang:1.27.3 → alpine），compose 直接 build |
 | `service-a/main.go` | order-service：HTTP、Redis、Kafka 生产/消费、自定义 counter |
 | `service-b/main.go` | inventory-service：HTTP、Redis |
-| `internal/telemetry/telemetry.go` | OTel 初始化：Resource、三套 Provider、OTLP exporter、W3C 传播 |
+| `pkg/telemetry/telemetry.go` | OTel 初始化：Resource、三套 Provider、OTLP exporter、W3C 传播 |
 
 ## 排障
 
