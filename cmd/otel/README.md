@@ -27,7 +27,7 @@ curl http://localhost:18080/order/1   # 连打两次，第二次命中 Redis 缓
 
 - Grafana：<http://localhost:13000>，`admin` / `admin`
 - 停止：`docker compose down`；连数据一起清：`docker compose down -v`
-- 端口被占用（例如之前手动 `docker run` 过一个 otel-lgtm）：先 `docker rm -f <容器名>`，否则 13000/24317 会冲突
+- 端口被占用（例如之前手动 `docker run` 过一个 otel-lgtm）：先 `docker rm -f <容器名>`，否则 13000/24317/24318 会冲突
 - 想模拟多副本：`docker compose up -d --scale inventory-service=3`（order-service 有宿主端口映射，扩多个需先去掉 `ports`）
 
 ## 在 Grafana 里查什么
@@ -56,14 +56,25 @@ curl http://localhost:18080/order/1   # 连打两次，第二次命中 Redis 缓
 - Kafka 是 KRaft 单节点，`orders` topic 由 `kafka-init` 一次性创建。
 - 镜像版本差异：`grafana/otel-lgtm:latest` 实测 v0.40.0，metrics 后端是 **Prometheus**（容器内 :9090）；
   更早的镜像是 Mimir。Grafana 里统一显示为 `Prometheus` 数据源，没有名为 Mimir 的数据源。
-- 历史路径已移除，需要时从 git 历史取：kind + K8s 部署在 `5287f3c` 之前的提交里，
-  Alloy collector 的 compose override 在 `9d1be18`。
+- 历史路径已移除，需要时从 git 历史取：kind + K8s 清单在 `5287f3c` 的 tree 里
+  （如 `git show 5287f3c:cmd/otel/deploy/alloy.yaml`），Alloy collector 的 compose override
+  在 `9d1be18` 的 tree 里。
 
 ## 文件
 
+```text
+cmd/otel/
+├── docker-compose.yml            # lgtm + redis + kafka + 两个服务
+├── Dockerfile                    # 多阶段构建，compose 直接 build
+├── README.md
+├── pkg/telemetry/telemetry.go    # OTel 初始化（两个服务共用）
+├── service-a/main.go             # order-service
+└── service-b/main.go             # inventory-service
+```
+
 | 文件 | 内容 |
 |---|---|
-| `docker-compose.yml` | lgtm + redis + kafka + 两个服务（应用直连 lgtm） |
+| `docker-compose.yml` | lgtm + redis + kafka + 两个服务（应用直连 lgtm）；`kafka-init` 一次性建 topic |
 | `Dockerfile` | 多阶段构建（golang:1.27.3 → alpine），compose 直接 build |
 | `service-a/main.go` | order-service：HTTP、Redis、Kafka 生产/消费、自定义 counter |
 | `service-b/main.go` | inventory-service：HTTP、Redis |
