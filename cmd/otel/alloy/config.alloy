@@ -1,0 +1,35 @@
+// OTLP 网关：收下应用发来的 trace/metric/log，批量转发给 otel-lgtm。
+// 这就是 collector 组件模型的最小样子：receiver -> processor -> exporter。
+// 换成官方镜像 otel/opentelemetry-collector-contrib 也能用同样的 YAML 表达。
+
+otelcol.receiver.otlp "default" {
+	grpc {
+		endpoint = "0.0.0.0:4317"
+	}
+	http {
+		endpoint = "0.0.0.0:4318"
+	}
+
+	output {
+		metrics = [otelcol.processor.batch.default.input]
+		logs    = [otelcol.processor.batch.default.input]
+		traces  = [otelcol.processor.batch.default.input]
+	}
+}
+
+otelcol.processor.batch "default" {
+	output {
+		metrics = [otelcol.exporter.otlp.default.input]
+		logs    = [otelcol.exporter.otlp.default.input]
+		traces  = [otelcol.exporter.otlp.default.input]
+	}
+}
+
+otelcol.exporter.otlp "default" {
+	client {
+		endpoint = "lgtm:4317"
+		tls {
+			insecure = true
+		}
+	}
+}

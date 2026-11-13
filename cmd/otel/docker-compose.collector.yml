@@ -1,0 +1,50 @@
+# collector 模式：在应用和后端之间插入 Alloy，教学用。
+#   docker compose -f docker-compose.yml -f docker-compose.collector.yml up -d --build
+#
+# 和默认形态的唯一差别：两个服务的 OTEL_EXPORTER_OTLP_ENDPOINT 指向 alloy，
+# 由 alloy 统一收 OTLP 再转发给 lgtm；profiler 单独一个容器抓 pprof。
+services:
+  order-service:
+    environment:
+      OTEL_EXPORTER_OTLP_ENDPOINT: http://alloy:4317
+    depends_on:
+      alloy:
+        condition: service_started
+
+  inventory-service:
+    environment:
+      OTEL_EXPORTER_OTLP_ENDPOINT: http://alloy:4317
+    depends_on:
+      alloy:
+        condition: service_started
+
+  # OTLP 网关：应用 → alloy:4317 → lgtm:4317
+  alloy:
+    image: grafana/alloy:latest
+    command:
+      - run
+      - /etc/alloy/config.alloy
+      - --server.http.listen-addr=0.0.0.0:12345
+    volumes:
+      - ./alloy/config.alloy:/etc/alloy/config.alloy:ro
+    depends_on:
+      lgtm:
+        condition: service_healthy
+
+  # pprof 抓取必须单实例：和应用的 CPU profiler 抢同一进程会报
+  # "cpu profiling already in use"，所以单独一个副本，不能跟网关混在一起扩。
+  alloy-profiler:
+    image: grafana/alloy:latest
+    command:
+      - run
+      - /etc/alloy/config-profiler.alloy
+      - --server.http.listen-addr=0.0.0.0:12345
+    volumes:
+      - ./alloy/config-profiler.alloy:/etc/alloy/config-profiler.alloy:ro
+    depends_on:
+      lgtm:
+        condition: service_healthy
+      order-service:
+        condition: service_started
+      inventory-service:
+        condition: service_started

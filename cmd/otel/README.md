@@ -1,51 +1,49 @@
 # otel：Grafana LGTM 可观测性实践
 
-一个可运行的 OpenTelemetry 端到端示例：两个 Go 服务（HTTP + Redis + Kafka）通过 OTLP 把 trace/metric/log 发给 Alloy，再进 LGTM 栈；profile 由 Alloy 抓 `/debug/pprof`。
-目的只是跑通「一次请求 → 四类信号 → Grafana 查得到」，不是生产部署模板。
+一个可运行的 OpenTelemetry 端到端示例：两个 Go 服务（HTTP + Redis + Kafka）用 OTLP 上报 trace/metric/log，
+profile 由 Alloy 抓 `/debug/pprof`，最终在 Grafana 里查询。
+目的是跑通「一次请求 → 四类信号 → 可查询」，不是生产部署模板。
 
-## 架构
+## 两种形态
+
+**默认：应用直连后端**（没有 collector）
 
 ```text
-curl /order/{id} ──► order-service (service-a :8080) ──HTTP──► inventory-service (service-b :8080)
-                          │ Redis / Kafka(orders)              │ Redis
-                          │ OTLP :4317(gRPC) / :4318(HTTP)
-                          ▼
-                    Alloy DaemonSet ──OTLP──► otel-lgtm
-                                               ├─ Grafana    :3000
-                                               ├─ Loki       :3100
-                                               ├─ Tempo      :3200
-                                               ├─ Prometheus :9090
-                                               └─ Pyroscope  :4040
-                    Alloy Deployment（单副本）── pyroscope.scrape ──► Pyroscope
+curl /order/{id} ──► order-service ──HTTP──► inventory-service
+                         │ Redis / Kafka(orders)
+                         │ OTLP :4317
+                         ▼
+                    otel-lgtm（单容器：Grafana/Tempo/Prometheus/Loki/Pyroscope）
 ```
 
-## 快速开始（kind 全链路）
+**collector 模式**：在链路中间插一层 Alloy（教学用，见下）
+
+```text
+两个服务 ──OTLP──► alloy:4317 ──OTLP──► lgtm:4317
+                   alloy-profiler ──pprof scrape──► Pyroscope
+```
+
+## 快速开始
 
 ```bash
-brew install kind kubectl      # 需要 Docker Desktop，建议 ≥4GB 内存
-
 cd cmd/otel
-./scripts/up.sh                # 建集群、构建两个镜像、导入、apply、等就绪
-kubectl port-forward -n demo svc/order-service 18080:8080
-```
-
-```bash
+docker compose up -d --build      # 首次构建约 1~2 分钟
 curl http://localhost:18080/order/1   # 连打两次，第二次命中 Redis 缓存
 ```
 
-- Grafana：<http://localhost:13000>（NodePort 30300 映射到宿主机 13000），`admin` / `admin`
-- NodePort 不通时：`kubectl port-forward -n observability svc/otel-lgtm 13001:3000`
-- 销毁：`./scripts/down.sh`（删掉 kind 集群 `otel-demo`）
+- Grafana：<http://localhost:13000>，`admin` / `admin`
+- 停止：`docker compose down`；连数据一起清：`docker compose down -v`
+- 端口被占用（例如之前手动 `docker run` 过一个 otel-lgtm）：先 `docker rm -f <容器名>`，否则 13000/14040/24317 会冲突
+- 想模拟多副本：`docker compose up -d --scale inventory-service=3`（order-service 有宿主端口映射，扩多个需先去掉 `ports`）
 
-## 只起后端（不建 kind 集群）
+## collector 模式
 
 ```bash
-docker run -d --name otel-lgtm \
-  -p 13000:3000 -p 14040:4040 -p 24317:4317 -p 24318:4318 \
-  grafana/otel-lgtm:latest
+docker compose -f docker-compose.yml -f docker-compose.collector.yml up -d --build
 ```
 
-应用侧设置 `OTEL_EXPORTER_OTLP_ENDPOINT=http://localhost:24317` 即可（service-a/b 还需要可达的 Redis、Kafka）。
+和默认形态的差别只有一处：两个服务的 `OTEL_EXPORTER_OTLP_ENDPOINT` 从 `lgtm:4317` 变成 `alloy:4317`。
+应用代码零改动——OTLP 的出口完全由标准环境变量决定。
 
 ## 在 Grafana 里查什么
 
@@ -56,38 +54,57 @@ docker run -d --name otel-lgtm \
 | metric | Prometheus | `orders_total`、`cache_hits_total`、`inventory_requests_total` |
 | profile | Pyroscope | `{service_name="order-service"}` |
 
-一次 cache miss 的完整链路：`GET /order/{id}` → `handle_order` → `redis.get` → `inventory.request` → `inventory-service GET /inventory/{id}` → `redis.get/set` → `redis.set` → `kafka.produce` → `kafka.consume`（消费端从消息头恢复 traceparent）。
+一次 cache miss 的完整链路：`GET /order/{id}` → `handle_order` → `redis.get` → `inventory.request` →
+`inventory-service GET /inventory/{id}` → `redis.get/set` → `redis.set` → `kafka.produce` → `kafka.consume`
+（消费端从消息头恢复 traceparent）。
 
 ## 关键设计
 
-- **Alloy 拆成 DaemonSet + Deployment**：DaemonSet 每节点一个，作为 OTLP 网关；pprof 抓取必须单副本，两个实例同时抓同一个进程会报 `cpu profiling already in use`，所以 profile 抓取放在单副本 Deployment。
-- **profile 走 Alloy `pyroscope.scrape`**，不是应用内上报；应用只负责暴露 `:6060/debug/pprof`。
+- **默认不装 collector**：2 服务、6 实例的规模直连后端就够，collector 的价值在按 traceID 分片
+  （tail sampling/spanmetrics）、多后端扇出、节点级采集，规模上来再加。
+- **profile 抓取必须单实例**：`alloy-profiler` 单独一个容器。两个实例同时抓同一个 Go 进程会报
+  `Could not enable CPU profiling: cpu profiling already in use`，这也是它不能和网关容器混在一起扩的原因。
+- **两种形态只靠环境变量切换**，证明 OTLP 把「数据怎么产生」和「数据怎么传」解耦了。
 
-## 已知限制 / 坑
+## 已知限制
 
-- otel-lgtm 没挂持久卷，重启容器后 Grafana / Loki / Tempo / Prometheus / Pyroscope 数据全清空。
-- kind 节点容器默认拉不到 Docker Hub（容器内代理指向 127.0.0.1），`up.sh` 用 `docker save` + `ctr images import` 手动导入镜像。
-- macOS + Docker Desktop 没有 eBPF：profile 只能走 pprof 拉取。镜像内置的 OBI（eBPF 自动埋点）需 `ENABLE_OBI=true --pid=host --privileged` 且 Linux 内核才可用，本示例未启用。
-- **镜像版本差异**：`grafana/otel-lgtm:latest` 实测为 v0.40.0，metrics 后端是 **Prometheus**（容器内 :9090，Grafana 里以 `Prometheus` 数据源出现）；更早的镜像是 Mimir。两者在 Grafana 里都表现为 Prometheus 数据源，不存在名为 Mimir 的数据源。
+- `otel-lgtm` 是单容器单副本：无 HA、无对象存储。数据写 `lgtm-data` volume，`docker compose down -v` 会清空。
+- Kafka 是 KRaft 单节点，`orders` topic 由 `kafka-init` 一次性创建（对应原来 k8s 的 init Job）。
+- macOS + Docker Desktop 没有 eBPF，profile 只能走 pprof 拉取。
+- 镜像版本差异：`grafana/otel-lgtm:latest` 实测 v0.40.0，metrics 后端是 **Prometheus**（容器内 :9090）；
+  更早的镜像是 Mimir。Grafana 里统一显示为 `Prometheus` 数据源，没有名为 Mimir 的数据源。
+- 原来的 kind + K8s 部署路径已移除，需要时从 git 历史取（删除前的提交是 `5287f3c`）。
 
 ## 文件
 
 | 文件 | 内容 |
 |---|---|
+| `docker-compose.yml` | 默认形态：lgtm + redis + kafka + 两个服务（直连 lgtm） |
+| `docker-compose.collector.yml` | override：接入 Alloy 网关与 pprof profiler |
+| `alloy/config.alloy` | OTLP 网关：receiver → batch → exporter |
+| `alloy/config-profiler.alloy` | `pyroscope.scrape` 抓两个服务的 `/debug/pprof` |
+| `Dockerfile` | 多阶段构建（golang:1.27.3 → alpine），compose 直接 build |
 | `service-a/main.go` | order-service：HTTP、Redis、Kafka 生产/消费、自定义 counter |
 | `service-b/main.go` | inventory-service：HTTP、Redis |
-| `internal/telemetry/telemetry.go` | OTel 初始化：Trace/Metric/Log provider + OTLP gRPC exporter（读标准环境变量） |
-| `deploy/lgtm.yaml` | `grafana/otel-lgtm`（NodePort 30300 → Grafana） |
-| `deploy/alloy.yaml` | Alloy DaemonSet（OTLP 网关）+ 单副本 Deployment（pprof 抓取） |
-| `deploy/services.yaml` | 两个服务（:8080、pprof :6060）+ `OTEL_EXPORTER_OTLP_ENDPOINT` |
-| `deploy/{redis,kafka}.yaml` | Redis、Kafka 3.9 KRaft 单节点 |
-| `scripts/up.sh` / `down.sh` | 一键起 / 删 |
-| `Dockerfile` | linux 静态二进制 → alpine |
+| `internal/telemetry/telemetry.go` | OTel 初始化：Resource、三套 Provider、OTLP exporter、W3C 传播 |
 
-## 跑通验证
+## 排障
 
 ```bash
-kubectl -n demo get pods -o wide            # 全 Running
-kubectl -n observability get pods           # otel-lgtm / alloy / alloy-profiler
-curl -s localhost:18080/healthz             # ok
+docker compose ps                                  # 看各容器状态/健康
+docker compose logs -f order-service               # 导出失败会每 2s 重试并打错误
+curl -s localhost:18080/healthz                    # ok
+curl -s localhost:13000/api/health                 # Grafana
+# 确认 trace 到了 Tempo：刚写入的 span 在 ingester 里还没 flush，搜索接口会返回空，
+# 所以看摄入计数更可靠
+docker compose exec lgtm curl -s http://127.0.0.1:3200/metrics | grep tempo_distributor_spans_received_total
 ```
+
+## 端口
+
+| 服务 | 宿主机端口 |
+|---|---|
+| order-service HTTP | 18080 |
+| Grafana | 13000 |
+| OTLP gRPC / HTTP（本机调试用） | 24317 / 24318 |
+| Pyroscope | 14040 |
