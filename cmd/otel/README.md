@@ -1,27 +1,21 @@
 # otel：Grafana LGTM 可观测性实践
 
-一个可运行的 OpenTelemetry 端到端示例：两个 Go 服务（HTTP + Redis + Kafka）用 OTLP 上报 trace/metric/log，
-profile 由 Alloy 抓 `/debug/pprof`，最终在 Grafana 里查询。
-目的是跑通「一次请求 → 四类信号 → 可查询」，不是生产部署模板。
+一个可运行的 OpenTelemetry 端到端示例：两个 Go 服务（HTTP + Redis + Kafka）用 OTLP 上报
+trace / metric / log，在 Grafana 里统一查询。目的是跑通「一次请求 → 三类信号 → 可查询」，
+不是生产部署模板。
 
-## 两种形态
-
-**默认：应用直连后端**（没有 collector）
+## 架构
 
 ```text
 curl /order/{id} ──► order-service ──HTTP──► inventory-service
                          │ Redis / Kafka(orders)
                          │ OTLP :4317
                          ▼
-                    otel-lgtm（单容器：Grafana/Tempo/Prometheus/Loki/Pyroscope）
+                    otel-lgtm（单容器：Grafana + Tempo + Prometheus + Loki）
 ```
 
-**collector 模式**：在链路中间插一层 Alloy（教学用，见下）
-
-```text
-两个服务 ──OTLP──► alloy:4317 ──OTLP──► lgtm:4317
-                   alloy-profiler ──pprof scrape──► Pyroscope
-```
+**没有 collector**：2 服务、6 实例的规模直连后端就够；collector 的价值在按 traceID 分片
+（tail sampling / spanmetrics）、多后端扇出、节点级采集，规模上来再加。
 
 ## 快速开始
 
@@ -33,17 +27,8 @@ curl http://localhost:18080/order/1   # 连打两次，第二次命中 Redis 缓
 
 - Grafana：<http://localhost:13000>，`admin` / `admin`
 - 停止：`docker compose down`；连数据一起清：`docker compose down -v`
-- 端口被占用（例如之前手动 `docker run` 过一个 otel-lgtm）：先 `docker rm -f <容器名>`，否则 13000/14040/24317 会冲突
+- 端口被占用（例如之前手动 `docker run` 过一个 otel-lgtm）：先 `docker rm -f <容器名>`，否则 13000/24317 会冲突
 - 想模拟多副本：`docker compose up -d --scale inventory-service=3`（order-service 有宿主端口映射，扩多个需先去掉 `ports`）
-
-## collector 模式
-
-```bash
-docker compose -f docker-compose.yml -f docker-compose.collector.yml up -d --build
-```
-
-和默认形态的差别只有一处：两个服务的 `OTEL_EXPORTER_OTLP_ENDPOINT` 从 `lgtm:4317` 变成 `alloy:4317`。
-应用代码零改动——OTLP 的出口完全由标准环境变量决定。
 
 ## 在 Grafana 里查什么
 
@@ -52,7 +37,6 @@ docker compose -f docker-compose.yml -f docker-compose.collector.yml up -d --bui
 | trace | Tempo | `{resource.service.name="order-service" && name="GET /order/{id}"}` |
 | log | Loki | `{service_name=~"order-service|inventory-service"}` |
 | metric | Prometheus | `orders_total`、`cache_hits_total`、`inventory_requests_total` |
-| profile | Pyroscope | `{service_name="order-service"}` |
 
 一次 cache miss 的完整链路：`GET /order/{id}` → `handle_order` → `redis.get` → `inventory.request` →
 `inventory-service GET /inventory/{id}` → `redis.get/set` → `redis.set` → `kafka.produce` → `kafka.consume`
@@ -60,29 +44,26 @@ docker compose -f docker-compose.yml -f docker-compose.collector.yml up -d --bui
 
 ## 关键设计
 
-- **默认不装 collector**：2 服务、6 实例的规模直连后端就够，collector 的价值在按 traceID 分片
-  （tail sampling/spanmetrics）、多后端扇出、节点级采集，规模上来再加。
-- **profile 抓取必须单实例**：`alloy-profiler` 单独一个容器。两个实例同时抓同一个 Go 进程会报
-  `Could not enable CPU profiling: cpu profiling already in use`，这也是它不能和网关容器混在一起扩的原因。
-- **两种形态只靠环境变量切换**，证明 OTLP 把「数据怎么产生」和「数据怎么传」解耦了。
+- **不装 collector**：这个规模直连后端最省；collector 不是 OTel 协议的必需品，是规模化/治理的需求。
+- **换后端不改代码**：OTLP 出口只由 `OTEL_EXPORTER_OTLP_ENDPOINT` 决定，把值改成另一个 collector
+  或厂商 endpoint 即可。
+- **profile 不在本 demo 范围**：应用仍暴露 `:6060/debug/pprof`，可以 `go tool pprof` 手动分析；
+  要自动采集需要额外引入 agent（Alloy / OTel Collector）或 `pyroscope-go` SDK，Pyroscope 自己不会拉取。
 
 ## 已知限制
 
 - `otel-lgtm` 是单容器单副本：无 HA、无对象存储。数据写 `lgtm-data` volume，`docker compose down -v` 会清空。
-- Kafka 是 KRaft 单节点，`orders` topic 由 `kafka-init` 一次性创建（对应原来 k8s 的 init Job）。
-- macOS + Docker Desktop 没有 eBPF，profile 只能走 pprof 拉取。
+- Kafka 是 KRaft 单节点，`orders` topic 由 `kafka-init` 一次性创建。
 - 镜像版本差异：`grafana/otel-lgtm:latest` 实测 v0.40.0，metrics 后端是 **Prometheus**（容器内 :9090）；
   更早的镜像是 Mimir。Grafana 里统一显示为 `Prometheus` 数据源，没有名为 Mimir 的数据源。
-- 原来的 kind + K8s 部署路径已移除，需要时从 git 历史取（删除前的提交是 `5287f3c`）。
+- 历史路径已移除，需要时从 git 历史取：kind + K8s 部署在 `5287f3c` 之前的提交里，
+  Alloy collector 的 compose override 在 `9d1be18`。
 
 ## 文件
 
 | 文件 | 内容 |
 |---|---|
-| `docker-compose.yml` | 默认形态：lgtm + redis + kafka + 两个服务（直连 lgtm） |
-| `docker-compose.collector.yml` | override：接入 Alloy 网关与 pprof profiler |
-| `alloy/config.alloy` | OTLP 网关：receiver → batch → exporter |
-| `alloy/config-profiler.alloy` | `pyroscope.scrape` 抓两个服务的 `/debug/pprof` |
+| `docker-compose.yml` | lgtm + redis + kafka + 两个服务（应用直连 lgtm） |
 | `Dockerfile` | 多阶段构建（golang:1.27.3 → alpine），compose 直接 build |
 | `service-a/main.go` | order-service：HTTP、Redis、Kafka 生产/消费、自定义 counter |
 | `service-b/main.go` | inventory-service：HTTP、Redis |
@@ -107,4 +88,3 @@ docker compose exec lgtm curl -s http://127.0.0.1:3200/metrics | grep tempo_dist
 | order-service HTTP | 18080 |
 | Grafana | 13000 |
 | OTLP gRPC / HTTP（本机调试用） | 24317 / 24318 |
-| Pyroscope | 14040 |

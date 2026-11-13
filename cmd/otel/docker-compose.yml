@@ -1,19 +1,16 @@
 name: otel-demo
 
-# 默认形态：应用直接把 OTLP 发给单容器后端 otel-lgtm，链路里没有 collector。
+# 应用直接把 OTLP 发给单容器后端 otel-lgtm，链路里没有 collector。
 #   docker compose up -d --build
-# 想看 collector 在链路中间的样子，用 override 文件：
-#   docker compose -f docker-compose.yml -f docker-compose.collector.yml up -d --build
 
 services:
-  # 一体化后端：Grafana + Tempo + Prometheus + Loki + Pyroscope
+  # 一体化后端：Grafana + Tempo + Prometheus + Loki
   lgtm:
     image: grafana/otel-lgtm:latest
     ports:
       - "13000:3000" # Grafana
       - "24317:4317" # OTLP gRPC（本机调试用）
       - "24318:4318" # OTLP HTTP
-      - "14040:4040" # Pyroscope
     volumes:
       - lgtm-data:/data
     healthcheck:
