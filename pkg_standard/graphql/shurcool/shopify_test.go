@@ -44,6 +44,10 @@ type Product struct {
 }
 
 func Test1(t *testing.T) {
+	if token == "shpat_*" {
+		t.Skip("需要真实的 Shopify access token 才能运行该集成测试")
+	}
+
 	//httpClient := oauth2.NewClient(ctx, oauth2.StaticTokenSource(
 	//	&oauth2.Token{AccessToken: token},
 	//))

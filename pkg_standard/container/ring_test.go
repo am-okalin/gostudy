@@ -10,12 +10,15 @@ func TestRing(t *testing.T) {
 	r := ring.New(5)
 
 	// 2. 初始化环中的值
-	// 因为 ring 是循环的，我们只需要遍历一次 (r.Len()) 即可填满
+	// Do 只传元素值，无法写回，因此这里遍历环本身给每个节点赋值
 	initValue := 100
-	r.Do(func(x any) {
-		r.Value = initValue
+	for p := r; ; p = p.Next() {
+		p.Value = initValue
 		initValue += 100
-	})
+		if p.Next() == r {
+			break
+		}
+	}
 
 	// 验证初始化结果: [100, 200, 300, 400, 500]
 	t.Run("Initialization", func(t *testing.T) {

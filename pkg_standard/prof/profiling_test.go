@@ -81,24 +81,24 @@ func cleanWorkDir() {
 	if removeTempWorkDir {
 		err := remove(cpuProfilePath, 5, 2)
 		if err != nil {
-			fmt.Errorf("Error: Can not remove cpu profile '%s': %s\n",
+			fmt.Fprintf(os.Stderr, "Error: Can not remove cpu profile '%s': %s\n",
 				getAbsFilePath(cpuProfilePath), err)
 		}
 		err = remove(blockProfilePath, 5, 2)
 		if err != nil {
-			fmt.Errorf("Error: Can not remove block profile '%s': %s\n",
+			fmt.Fprintf(os.Stderr, "Error: Can not remove block profile '%s': %s\n",
 				getAbsFilePath(blockProfilePath), err)
 		}
 		err = remove(memProfilePath, 5, 2)
 		if err != nil {
-			fmt.Errorf("Error: Can not remove mem profile '%s': %s\n",
+			fmt.Fprintf(os.Stderr, "Error: Can not remove mem profile '%s': %s\n",
 				getAbsFilePath(memProfilePath), err)
 		}
 	}
 	if newTempWorkDir && removeTempWorkDir {
 		err := remove(tempWorkDir, 5, 3)
 		if err != nil {
-			fmt.Errorf("Error: Can not remove temp work dir '%s': %s\n",
+			fmt.Fprintf(os.Stderr, "Error: Can not remove temp work dir '%s': %s\n",
 				getAbsFilePath(tempWorkDir), err)
 		}
 	}

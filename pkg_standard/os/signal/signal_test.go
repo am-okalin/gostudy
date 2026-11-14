@@ -11,7 +11,7 @@ import (
 
 func TestName(t *testing.T) {
 	go func() {
-		sch := make(chan os.Signal)
+		sch := make(chan os.Signal, 1)
 		signal.Notify(sch, syscall.SIGINT, syscall.SIGTERM)
 		v := <-sch
 		fmt.Println("------", v)

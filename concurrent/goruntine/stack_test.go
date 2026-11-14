@@ -10,6 +10,12 @@ import (
 
 // TestStack panic时会打印出goroutine的ID, 状态，函数，调用栈的信息。
 func TestStack(t *testing.T) {
+	// 演示 panic 时的堆栈；recover 后测试继续，避免整个测试进程退出
+	defer func() {
+		if r := recover(); r != nil {
+			t.Log("recovered:", r)
+		}
+	}()
 	panic("get stack info")
 }
 

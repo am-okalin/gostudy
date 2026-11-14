@@ -55,7 +55,8 @@ func TestMM(t *testing.T) {
 
 func TestAtomicAdd(t *testing.T) {
 	m := make(map[string]*uint64)
-	//报错: m["a"]的值是nil
+	// m["a"] 在赋值前是 nil，直接 atomic.AddUint64(m["a"], 1) 会 panic
+	m["a"] = new(uint64)
 	atomic.AddUint64(m["a"], 1)
-	t.Log(m)
+	t.Log(*m["a"])
 }

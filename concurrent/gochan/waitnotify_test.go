@@ -11,6 +11,10 @@ import (
 
 // TestWaitNotifyBySignal 使用chan实现信号通知
 func TestWaitNotifyBySignal(t *testing.T) {
+	// 测试里无法等待用户按 Ctrl+C，延迟向当前进程发送 SIGINT 触发优雅退出
+	time.AfterFunc(200*time.Millisecond, func() {
+		_ = syscall.Kill(os.Getpid(), syscall.SIGINT)
+	})
 	waitNotifyBySignal()
 }
 
@@ -34,8 +38,9 @@ func waitNotifyBySignal() {
 
 	// todo::标出执行test的命令
 	// 处理CTRL+C等中断信号
-	termChan := make(chan os.Signal)
+	termChan := make(chan os.Signal, 1)
 	signal.Notify(termChan, os.Interrupt, os.Kill, syscall.SIGHUP, syscall.SIGINT, syscall.SIGTERM, syscall.SIGQUIT)
+	defer signal.Stop(termChan)
 	//signal.Notify(termChan, syscall.SIGINT, syscall.SIGTERM)
 	<-termChan
 

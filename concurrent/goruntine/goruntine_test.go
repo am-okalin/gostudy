@@ -20,16 +20,18 @@ func TestProcessorNum(t *testing.T) {
 
 func Test1(t *testing.T) {
 	go func() {
+		// 子协程内未 recover 的 panic 会终止整个进程，这里 recover 后测试才能继续
 		defer func() {
+			if r := recover(); r != nil {
+				t.Log("recovered in goroutine:", r)
+			}
 			t.Log("go_func_defer")
 		}()
 
 		t.Log("go_func")
 
 		//runtime.Goexit() //主动退出goruntine
-		panic("downing test") //panic会导致上层goruntine也panic
-
-		t.Log("go_func_exit")
+		panic("downing test")
 	}()
 
 	t.Log("func")

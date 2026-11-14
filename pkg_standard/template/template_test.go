@@ -9,7 +9,7 @@ import (
 func Test1(t *testing.T) {
 	sweaters := Inventory{"wool", 17}
 	tmpl, err := template.New("test").Delims("*|", "|*").
-		Parse("*|.Count|* items are made of *|.STORE_NAME|*")
+		Parse("*|.Count|* items are made of *|.ShopName|*")
 	if err != nil {
 		panic(err)
 	}

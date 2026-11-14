@@ -40,7 +40,7 @@ func createBox(seed int) box {
 		array = append(array, byte(seed))
 	}
 	return box{
-		Str:   string(seed),
+		Str:   string(rune(seed)),
 		Code:  rune(seed),
 		Bytes: array,
 	}

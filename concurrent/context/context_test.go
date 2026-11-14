@@ -22,25 +22,30 @@ type otherContext struct {
 
 func TestWithCancel(t *testing.T) {
 	c0 := context.Background()
-	c1, _ := context.WithCancel(c0)
+	c1, cancel1 := context.WithCancel(c0)
+	defer cancel1()
 	c2, cancel2 := context.WithCancel(c1)
+	defer cancel2()
 
 	if got, want := fmt.Sprint(c2), "context.Background.WithCancel.WithCancel"; got != want {
-		t.Errorf("c1.String() = %q want %q", got, want)
+		t.Errorf("c2.String() = %q want %q", got, want)
 	}
 
 	//即便链路中存在非cancelCtx的类型，祖先CancelCtx被Cancel时也会通知到子孙CancelCtx
 	c3 := otherContext{c2}
-	c4, _ := context.WithCancel(c3)
-	contexts := []context.Context{c0, c1, c2, c3, c4}
+	c4, cancel4 := context.WithCancel(c3)
+	defer cancel4()
 
-	for i, c := range contexts {
+	// c0 是 Background，Done 为 nil；c1~c4 都有各自的 Done
+	if d := c0.Done(); d != nil {
+		t.Errorf("c0.Done() == %v want nil", d)
+	}
+	for i, c := range []context.Context{c1, c2, c3, c4} {
 		if d := c.Done(); d == nil {
-			//c0.Done返回nil, c3.Done则返回c2.Done对象, 其他返回各自的Done对象
-			t.Errorf("c[%d].Done() == %v want non-nil", i, d)
+			t.Errorf("c[%d].Done() == %v want non-nil", i+1, d)
 		}
 		if e := c.Err(); e != nil {
-			t.Errorf("c[%d].Err() == %v want nil", i, e)
+			t.Errorf("c[%d].Err() == %v want nil", i+1, e)
 		}
 
 		select {
@@ -51,15 +56,20 @@ func TestWithCancel(t *testing.T) {
 	}
 
 	cancel2() // Should propagate synchronously.
-	for i, c := range contexts {
+	// cancel2 会同步通知到 c2 及其子孙 c3、c4，但不会影响祖先 c0、c1
+	for i, c := range []context.Context{c2, c3, c4} {
 		select {
 		case <-c.Done():
 		default:
-			//cancel2无法影响祖先，所以c0,c1仍然blocked
-			t.Errorf("<-c[%d].Done() blocked, but shouldn't have", i)
+			t.Errorf("<-c[%d].Done() blocked, but shouldn't have", i+2)
 		}
 		if e := c.Err(); e != context.Canceled {
-			t.Errorf("c[%d].Err() == %v want %v", i, e, context.Canceled)
+			t.Errorf("c[%d].Err() == %v want %v", i+2, e, context.Canceled)
+		}
+	}
+	for i, c := range []context.Context{c0, c1} {
+		if e := c.Err(); e != nil {
+			t.Errorf("c[%d].Err() == %v want nil", i, e)
 		}
 	}
 }

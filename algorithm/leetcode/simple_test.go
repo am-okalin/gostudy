@@ -2,7 +2,6 @@ package leetcode
 
 import (
 	"fmt"
-	"log"
 	"testing"
 )
 
@@ -19,9 +18,16 @@ func TestIp2Num(t *testing.T) {
 	t.Log(num2, ip2)
 }
 
-func ExampleGroupAnagrams() {
-	length := groupAnagrams([]string{"eat", "tea", "tan", "ate", "nat", "bat"})
-	log.Fatal(length)
-	// Output:
-	// {"bat"}, {"nat", "tan"}, {"ate", "eat", "tea"}}
+func TestGroupAnagrams(t *testing.T) {
+	groups := groupAnagrams([]string{"eat", "tea", "tan", "ate", "nat", "bat"})
+	if len(groups) != 3 {
+		t.Fatalf("groupAnagrams() = %v, want 3 groups", groups)
+	}
+	total := 0
+	for _, group := range groups {
+		total += len(group)
+	}
+	if total != 6 {
+		t.Fatalf("groupAnagrams() = %v, want 6 elements in total", groups)
+	}
 }

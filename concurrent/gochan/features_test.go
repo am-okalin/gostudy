@@ -59,12 +59,14 @@ func TestChFor(t *testing.T) {
 	go func() {
 		for {
 			select {
-			case v := <-ch:
+			case v, ok := <-ch:
+				// 通道关闭后若只写 v := <-ch，会一直读到零值形成忙循环
+				if !ok {
+					return
+				}
 				fmt.Println("for-select:", v)
 			}
 		}
-		//todo::本协程未退出
-		fmt.Println("for select done")
 	}()
 
 	// for-range与for-select功能相等
@@ -147,6 +149,7 @@ func TestCh1(t *testing.T) {
 func TestCh2(t *testing.T) {
 	num := 10
 	ch := make(chan string, num)
+	done := make(chan struct{})
 	go func() {
 		for i := range num {
 			ch <- fmt.Sprintf("a%d", i)
@@ -157,6 +160,7 @@ func TestCh2(t *testing.T) {
 	}()
 
 	go func() {
+		defer close(done)
 		for range num {
 			v := <-ch
 			t.Logf("out:%s", v)
@@ -164,7 +168,8 @@ func TestCh2(t *testing.T) {
 		}
 	}()
 
-	time.Sleep(time.Minute)
+	// 等消费者读完，避免固定 sleep 造成的等待或竞态
+	<-done
 }
 
 func TestCh3(t *testing.T) {
@@ -189,25 +194,26 @@ func TestCh3(t *testing.T) {
 }
 
 func TestCh4(t *testing.T) {
+	// 所有 goroutine 共享同一个计数器，才能按 0..9 的顺序依次触发
+	var count atomic.Uint32
 	for i := range uint32(10) {
 		// 如此的话会先对子goruntine的形参会先求值
 		go func(i uint32) {
 			fn := func() {
 				fmt.Println(i)
 			}
-			trigger(i, fn)
+			trigger(&count, i, fn)
 		}(i)
 	}
-	trigger(10, func() {})
+	trigger(&count, 10, func() {})
 }
 
-func trigger(i uint32, fn func()) {
-	var count atomic.Uint32
+func trigger(count *atomic.Uint32, i uint32, fn func()) {
 	for {
 		if n := count.Load(); n == i {
 			fn()
 			count.Add(1)
-			break
+			return
 		}
 		time.Sleep(time.Nanosecond)
 	}
