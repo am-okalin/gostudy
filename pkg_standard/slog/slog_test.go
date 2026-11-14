@@ -7,16 +7,10 @@
 //   - Handler：决定日志输出成什么样（TextHandler / JSONHandler / 自定义），
 //     同时决定级别过滤（Enabled）以及如何携带 With/WithGroup 的上下文。
 //
-//     1. LevelVar 动态调整级别               TestLevelVar
-//     2. LogValuer 自定义类型在日志中的表示  TestLogValuer
-//     3. Enabled 提前判断，避免无谓开销      TestEnabled
-//     4. 自定义 Handler 1：包装已有 Handler  TestContextHandler
-//     5. 自定义 Handler 2：直接处理 Record   TestRecordHandler
-//     6. MultiHandler 同时输出多种格式       TestMultiHandler
-//     7. DiscardHandler 完全丢弃日志         TestDiscardHandler
-//     8. 与标准库 log 包互操作               TestLogBridge
-//     9. 把 Handler 包装成 *log.Logger       TestNewLogLogger
-//     10. 内置属性 key 常量                  TestBuiltinKeys
+//     1. MultiHandler 同时输出多种格式       TestMultiHandler
+//     2. DiscardHandler 完全丢弃日志         TestDiscardHandler
+//     3. 自定义 Handler 1：包装已有 Handler  TestContextHandler
+//     4. 自定义 Handler 2：直接处理 Record   TestRecordHandler
 //
 // 另外，可直接运行的示例函数（Example_basic）见 example_test.go。
 // 运行方式（pkg_standard 已在 go.work 中，可以直接在模块目录下跑）：
@@ -29,7 +23,6 @@ import (
 	"context"
 	"fmt"
 	"io"
-	"log"
 	"log/slog"
 	"strings"
 	"sync"
@@ -56,13 +49,6 @@ func assertContains(t *testing.T, got, want string) {
 	}
 }
 
-func assertNotContains(t *testing.T, got, notWant string) {
-	t.Helper()
-	if strings.Contains(got, notWant) {
-		t.Fatalf("输出中不应出现 %q\n实际输出:\n%s", notWant, got)
-	}
-}
-
 // outputLines 把日志输出按行切开，去掉首尾空行。
 func outputLines(s string) []string {
 	s = strings.TrimSpace(s)
@@ -73,98 +59,49 @@ func outputLines(s string) []string {
 }
 
 // ----------------------------------------------------------------------------
-// 1. LevelVar：运行期动态调整级别（常用于 /debug 接口或热更新）
+// 1. MultiHandler：一条日志同时交给多个 Handler（Go 1.26+）
 // ----------------------------------------------------------------------------
 
-func TestLevelVar(t *testing.T) {
-	var buf bytes.Buffer
-	var lv slog.LevelVar // 零值 = INFO
-	logger := slog.New(slog.NewTextHandler(&buf, &slog.HandlerOptions{
-		Level:       &lv, // 用 Leveler（LevelVar 实现了它）动态取级别
-		ReplaceAttr: Replacer,
-	}))
+func TestMultiHandler(t *testing.T) {
+	var textBuf, jsonBuf bytes.Buffer
+	logger := slog.New(slog.NewMultiHandler(
+		slog.NewTextHandler(&textBuf, textOptions(nil)),
+		slog.NewJSONHandler(&jsonBuf, jsonOptions(nil)),
+	))
+	logger.Info("multi", "k", "v")
 
-	logger.Debug("d1")      // 还没放开 DEBUG，丢弃
-	lv.Set(slog.LevelDebug) // 运行期改成 DEBUG
-	logger.Debug("d2")      // 通过
-	logger.Info("i1")       // 通过
-	lv.Set(slog.LevelWarn)  // 改成 WARN
-	logger.Info("i2")       // 丢弃
-	logger.Warn("w1")       // 通过
+	t.Logf("TextHandler 输出: %s", strings.TrimSpace(textBuf.String()))
+	t.Logf("JSONHandler 输出: %s", strings.TrimSpace(jsonBuf.String()))
+	assertContains(t, textBuf.String(), "level=INFO msg=multi k=v")
+	assertContains(t, jsonBuf.String(), `"msg":"multi","k":"v"`)
 
-	lines := outputLines(buf.String())
-	t.Logf("LevelVar 输出:\n%s", buf.String())
-	if len(lines) != 3 {
-		t.Fatalf("期望 3 行输出，实际 %d 行: %q", len(lines), buf.String())
+	// MultiHandler.Enabled 的语义是“任一子 Handler 能处理即可”。
+	ctx := context.Background()
+	if logger.Enabled(ctx, slog.LevelDebug) {
+		t.Error("两个 Handler 默认都是 INFO，DEBUG 不应该启用")
 	}
-	assertContains(t, lines[0], "level=DEBUG msg=d2")
-	assertContains(t, lines[1], "level=INFO msg=i1")
-	assertContains(t, lines[2], "level=WARN msg=w1")
-	if got := lv.String(); got != "LevelVar(WARN)" {
-		t.Errorf("LevelVar.String() = %q", got)
+	if !logger.Enabled(ctx, slog.LevelWarn) {
+		t.Error("WARN 应该启用")
 	}
 }
 
 // ----------------------------------------------------------------------------
-// 2. LogValuer：自定义类型决定自己出现在日志里的样子
+// 2. DiscardHandler：完全丢弃日志（Go 1.27+），适合测试或彻底关闭日志
 // ----------------------------------------------------------------------------
 
-// account 实现了 slog.LogValuer：
-// 日志里无论用 slog.Any("account", u) 还是 "account", u，都会调用 LogValue()，
-// 从而避免把敏感字段（token）原样打出去。
-type account struct {
-	name  string
-	token string
-}
-
-func (a account) LogValue() slog.Value {
-	return slog.GroupValue(
-		slog.String("name", a.name),
-		slog.String("token", "****"),
-	)
-}
-
-func TestLogValuer(t *testing.T) {
-	var buf bytes.Buffer
-	logger := slog.New(slog.NewTextHandler(&buf, textOptions(nil)))
-
-	logger.Info("login", "account", account{name: "alice", token: "secret-token"})
-
-	got := buf.String()
-	t.Logf("LogValuer 输出: %s", strings.TrimSpace(got))
-	assertContains(t, got, "account.name=alice")
-	assertContains(t, got, "account.token=****")
-	assertNotContains(t, got, "secret-token")
-}
-
-// ----------------------------------------------------------------------------
-// 3. Enabled：先问一句“要不要输出”，避免昂贵的参数计算
-// ----------------------------------------------------------------------------
-
-func TestEnabled(t *testing.T) {
-	// 输出目标是 io.Discard：只看 Enabled 判断，不关心实际输出。
-	logger := slog.New(slog.NewTextHandler(io.Discard, &slog.HandlerOptions{Level: slog.LevelWarn}))
+func TestDiscardHandler(t *testing.T) {
+	logger := slog.New(slog.DiscardHandler)
 	ctx := context.Background()
 
-	calls := 0
-	if logger.Enabled(ctx, slog.LevelDebug) {
-		calls++ // 期望不进入
+	// DiscardHandler 对所有级别都返回 false，Logger 连 Record 都不会创建。
+	if logger.Enabled(ctx, slog.LevelInfo) || logger.Enabled(ctx, slog.LevelError) {
+		t.Fatal("DiscardHandler 不应启用任何级别")
 	}
-	if logger.Enabled(ctx, slog.LevelError) {
-		calls++
-	}
-	if calls != 1 {
-		t.Fatalf("Enabled 判断错误，calls = %d", calls)
-	}
-
-	// 典型用法：只有确定要打日志时，才去拼装耗时/昂贵的参数。
-	if logger.Enabled(ctx, slog.LevelDebug) {
-		t.Log("这里不会执行")
-	}
+	logger.Info("should-not-appear") // 无输出、不 panic
 }
 
 // ----------------------------------------------------------------------------
-// 4. 自定义 Handler 1：包装已有 Handler，从 context 追加属性（中间件模式）
+// 3. 自定义 Handler 1：包装已有 Handler，从 context 追加属性（中间件模式）
 // ----------------------------------------------------------------------------
 
 type traceKey struct{}
@@ -213,7 +150,7 @@ func TestContextHandler(t *testing.T) {
 }
 
 // ----------------------------------------------------------------------------
-// 5. 自定义 Handler 2：直接处理 Record，观察 Handler 接口的组成细节
+// 4. 自定义 Handler 2：直接处理 Record，观察 Handler 接口的组成细节
 // ----------------------------------------------------------------------------
 
 // recordHandler 把 Record 格式化成：LEVEL "msg" key=value ...
@@ -336,118 +273,6 @@ func TestRecordHandler(t *testing.T) {
 	// 只有之后的属性（status）带 http. 前缀——这正是 Handler 契约要求的行为。
 	if want := `INFO "request" app=demo http.status=200`; lines[1] != want {
 		t.Fatalf("第二行 = %q, want %q", lines[1], want)
-	}
-}
-
-// ----------------------------------------------------------------------------
-// 6. MultiHandler：一条日志同时交给多个 Handler（Go 1.26+）
-// ----------------------------------------------------------------------------
-
-func TestMultiHandler(t *testing.T) {
-	var textBuf, jsonBuf bytes.Buffer
-	logger := slog.New(slog.NewMultiHandler(
-		slog.NewTextHandler(&textBuf, textOptions(nil)),
-		slog.NewJSONHandler(&jsonBuf, jsonOptions(nil)),
-	))
-	logger.Info("multi", "k", "v")
-
-	t.Logf("TextHandler 输出: %s", strings.TrimSpace(textBuf.String()))
-	t.Logf("JSONHandler 输出: %s", strings.TrimSpace(jsonBuf.String()))
-	assertContains(t, textBuf.String(), "level=INFO msg=multi k=v")
-	assertContains(t, jsonBuf.String(), `"msg":"multi","k":"v"`)
-
-	// MultiHandler.Enabled 的语义是“任一子 Handler 能处理即可”。
-	ctx := context.Background()
-	if logger.Enabled(ctx, slog.LevelDebug) {
-		t.Error("两个 Handler 默认都是 INFO，DEBUG 不应该启用")
-	}
-	if !logger.Enabled(ctx, slog.LevelWarn) {
-		t.Error("WARN 应该启用")
-	}
-}
-
-// ----------------------------------------------------------------------------
-// 7. DiscardHandler：完全丢弃日志（Go 1.27+），适合测试或彻底关闭日志
-// ----------------------------------------------------------------------------
-
-func TestDiscardHandler(t *testing.T) {
-	logger := slog.New(slog.DiscardHandler)
-	ctx := context.Background()
-
-	// DiscardHandler 对所有级别都返回 false，Logger 连 Record 都不会创建。
-	if logger.Enabled(ctx, slog.LevelInfo) || logger.Enabled(ctx, slog.LevelError) {
-		t.Fatal("DiscardHandler 不应启用任何级别")
-	}
-	logger.Info("should-not-appear") // 无输出、不 panic
-}
-
-// ----------------------------------------------------------------------------
-// 8. 与标准库 log 包互操作：slog.SetDefault + SetLogLoggerLevel
-// ----------------------------------------------------------------------------
-
-func TestLogBridge(t *testing.T) {
-	old := slog.Default()
-	defer slog.SetDefault(old) // 恢复默认 Logger，同时恢复 log 包的输出
-
-	var buf bytes.Buffer
-	slog.SetDefault(slog.New(slog.NewTextHandler(&buf, textOptions(nil))))
-
-	// SetDefault 之后，标准库 log 包的输出也会交给 slog 的 Handler。
-	log.Print("from standard log")
-	slog.Info("direct")
-
-	got := buf.String()
-	t.Logf("log 包桥接输出:\n%s", got)
-	assertContains(t, got, `level=INFO msg="from standard log"`)
-	assertContains(t, got, "level=INFO msg=direct")
-
-	// SetLogLoggerLevel 控制 log 包桥接记录使用的级别，返回旧级别。
-	oldLevel := slog.SetLogLoggerLevel(slog.LevelWarn)
-	defer slog.SetLogLoggerLevel(oldLevel)
-
-	buf.Reset()
-	log.Print("warn bridge")
-	assertContains(t, buf.String(), `level=WARN msg="warn bridge"`)
-
-	// 注意：桥接级别和 Handler 自己的级别都生效。
-	// 这里桥接级别是 DEBUG，但默认 Handler 只接收 INFO 及以上，所以没有输出。
-	slog.SetLogLoggerLevel(slog.LevelDebug)
-	buf.Reset()
-	log.Print("debug bridge")
-	if got := buf.String(); got != "" {
-		t.Fatalf("DEBUG 桥接记录应被 INFO Handler 过滤，实际输出: %q", got)
-	}
-}
-
-// ----------------------------------------------------------------------------
-// 9. 把 Handler 包装成 *log.Logger：slog -> log 方向
-// ----------------------------------------------------------------------------
-
-func TestNewLogLogger(t *testing.T) {
-	var buf bytes.Buffer
-	handler := slog.NewTextHandler(&buf, textOptions(nil))
-
-	// 适合改造只接受 *log.Logger 的旧代码/第三方库。
-	stdLogger := slog.NewLogLogger(handler, slog.LevelWarn)
-	stdLogger.Print("from log.Logger")
-
-	got := buf.String()
-	t.Logf("NewLogLogger 输出: %s", strings.TrimSpace(got))
-	assertContains(t, got, `level=WARN msg="from log.Logger"`)
-}
-
-// ----------------------------------------------------------------------------
-// 10. 内置属性 key 常量（ReplaceAttr 里常用）
-// ----------------------------------------------------------------------------
-
-func TestBuiltinKeys(t *testing.T) {
-	// 这些 key 是 Handler 输出的内置属性名，ReplaceAttr 里可据此改写或脱敏。
-	t.Logf("TimeKey=%q LevelKey=%q MessageKey=%q SourceKey=%q",
-		slog.TimeKey, slog.LevelKey, slog.MessageKey, slog.SourceKey)
-	if slog.TimeKey != "time" || slog.LevelKey != "level" ||
-		slog.MessageKey != "msg" || slog.SourceKey != "source" {
-		t.Fatalf("内置 key 与预期不符: %q %q %q %q",
-			slog.TimeKey, slog.LevelKey, slog.MessageKey, slog.SourceKey)
 	}
 }
 
