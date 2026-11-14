@@ -31,6 +31,7 @@ func Init(ctx context.Context, cfg Config) (func(context.Context) error, error) 
 		resource.WithAttributes(
 			semconv.ServiceName(cfg.ServiceName),
 			semconv.ServiceVersion(cfg.ServiceVersion),
+			// [development, test, staging, prod]
 			semconv.DeploymentEnvironmentNameKey.String(cfg.Environment),
 		),
 		resource.WithHost(),
