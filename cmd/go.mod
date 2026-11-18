@@ -4,6 +4,7 @@ go 1.27.3
 
 require (
 	github.com/didip/tollbooth/v8 v8.0.0
+	github.com/go-chi/chi/v5 v5.5.0
 	github.com/redis/go-redis/v9 v9.23.0
 	github.com/segmentio/kafka-go v0.4.51
 	go.opentelemetry.io/contrib/bridges/otelslog v0.21.0
